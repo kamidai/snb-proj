@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Spin Trick Judge v9</title>
+<title>Spin Trick Judge v10</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -20,335 +20,288 @@
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     pointer-events: none; z-index: 0; overflow: hidden;
   }
-  .snowflake {
-    position: absolute; top: -10px; color: #fff;
-    opacity: 0.7; animation: fall linear infinite;
-  }
+  .snowflake { position: absolute; top: -10px; color: #fff; opacity: 0.7; animation: fall linear infinite; }
   @keyframes fall { to { transform: translateY(105vh) rotate(360deg); } }
 
   .app {
     position: relative; z-index: 1; width: 100%;
-    max-width: 420px; padding: 16px; text-align: center;
+    max-width: 420px; padding: 12px 16px; text-align: center;
   }
 
   h1 {
-    font-size: 1.3em; margin: 12px 0 2px;
+    font-size: 1.2em; margin: 8px 0 2px;
     background: linear-gradient(135deg, #00d2ff, #7b2ff7);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    background-clip: text;
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
   }
-  .ver { font-size: 0.65em; color: #555; margin-bottom: 14px; }
+  .ver { font-size: 0.6em; color: #555; margin-bottom: 8px; }
 
-  /* ---- メイン表示 ---- */
+  /* ---- メイン表示（コンパクト化） ---- */
   .main-display {
     position: relative;
     background: rgba(255,255,255,0.05);
     border: 2px solid rgba(255,255,255,0.1);
-    border-radius: 20px; padding: 20px 15px; margin-bottom: 14px;
-    min-height: 200px; display: flex; flex-direction: column;
+    border-radius: 16px; padding: 14px 12px; margin-bottom: 8px;
+    min-height: 120px; display: flex; flex-direction: column;
     align-items: center; justify-content: center;
     transition: border-color 0.3s, box-shadow 0.3s;
   }
-  .main-display.countdown {
-    border-color: #ffaa00; box-shadow: 0 0 30px rgba(255,170,0,0.25);
-  }
-  .main-display.recording {
-    border-color: #ff3366; box-shadow: 0 0 40px rgba(255,51,102,0.35);
-    animation: recPulse 0.3s ease-in-out infinite alternate;
-  }
-  .main-display.landed {
-    border-color: #00ff88; box-shadow: 0 0 40px rgba(0,255,136,0.3);
-  }
-  .main-display.crashed {
-    border-color: #ff4444; box-shadow: 0 0 40px rgba(255,68,68,0.4);
-    animation: shake 0.4s ease-in-out;
-  }
-  @keyframes recPulse { from { transform: scale(1); } to { transform: scale(1.015); } }
+  .main-display.countdown { border-color: #ffaa00; box-shadow: 0 0 25px rgba(255,170,0,0.25); }
+  .main-display.recording { border-color: #ff3366; box-shadow: 0 0 30px rgba(255,51,102,0.35); animation: recPulse 0.3s ease-in-out infinite alternate; }
+  .main-display.landed { border-color: #00ff88; box-shadow: 0 0 30px rgba(0,255,136,0.3); }
+  .main-display.crashed { border-color: #ff4444; box-shadow: 0 0 30px rgba(255,68,68,0.4); animation: shake 0.4s ease-in-out; }
+  @keyframes recPulse { from { transform: scale(1); } to { transform: scale(1.012); } }
   @keyframes shake {
-    0%,100% { transform: translateX(0); }
-    20% { transform: translateX(-8px) rotate(-1deg); }
-    40% { transform: translateX(8px) rotate(1deg); }
-    60% { transform: translateX(-6px) rotate(-0.5deg); }
-    80% { transform: translateX(6px) rotate(0.5deg); }
+    0%,100% { transform: translateX(0); } 20% { transform: translateX(-6px) rotate(-1deg); }
+    40% { transform: translateX(6px) rotate(1deg); } 60% { transform: translateX(-4px); } 80% { transform: translateX(4px); }
   }
 
-  /* ---- スコア表示 ---- */
-  .score-display {
-    display: none; margin-top: 10px;
-  }
+  .phase-label { font-size: 0.7em; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 4px; color: #888; }
+  .phase-label.cd { color: #ffaa00; } .phase-label.rec { color: #ff3366; }
+  .phase-label.done { color: #00ff88; } .phase-label.crash { color: #ff4444; }
+
+  .big-text { font-size: 3em; font-weight: 900; line-height: 1.1; margin-bottom: 2px; }
+  .big-text.countdown-num { background: linear-gradient(135deg,#ffaa00,#ff6600); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .big-text.go { background: linear-gradient(135deg,#ff3366,#ff0099); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .big-text.trick { font-size: 1.4em; background: linear-gradient(135deg,#00ff88,#00d2ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .big-text.fail { font-size: 1.4em; background: linear-gradient(135deg,#ff4444,#ff6600); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .big-text.idle { font-size: 1em; color: #aaa; font-weight: 400; -webkit-text-fill-color: #aaa; }
+
+  .sub-text { font-size: 0.7em; color: #999; margin-top: 2px; line-height: 1.4; }
+
+  /* ---- スコア ---- */
+  .score-display { display: none; margin-top: 6px; }
   .score-display.show { display: block; }
   .score-number {
-    font-size: 2.8em; font-weight: 900; line-height: 1;
-    background: linear-gradient(135deg, #ff6b35, #ff2d95, #ff6b35);
-    background-size: 200% 100%;
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    background-clip: text;
+    font-size: 2.4em; font-weight: 900; line-height: 1;
+    background: linear-gradient(135deg, #ff6b35, #ff2d95, #ff6b35); background-size: 200% 100%;
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
     animation: scoreShine 2s linear infinite;
   }
-  @keyframes scoreShine {
-    0% { background-position: 0% 50%; }
-    100% { background-position: 200% 50%; }
-  }
-  .score-label {
-    font-size: 0.65em; color: #888; letter-spacing: 3px;
-    text-transform: uppercase; margin-bottom: 2px;
-  }
-  .score-appear {
-    animation: scorePop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-  }
-  @keyframes scorePop {
-    0% { transform: scale(0); opacity: 0; }
-    100% { transform: scale(1); opacity: 1; }
-  }
+  @keyframes scoreShine { 0% { background-position: 0% 50%; } 100% { background-position: 200% 50%; } }
+  .score-label { font-size: 0.6em; color: #888; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 1px; }
+  .score-appear { animation: scorePop 0.6s cubic-bezier(0.34,1.56,0.64,1) both; }
+  @keyframes scorePop { 0% { transform: scale(0); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 
-  /* キッカーボーナス表示 */
-  .kicker-bonus {
-    font-size: 0.7em; margin-top: 4px; font-weight: 700;
+  /* ---- シェアボタン ---- */
+  .share-row { display: flex; gap: 6px; justify-content: center; margin-top: 8px; }
+  .share-btn {
+    padding: 6px 12px; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px;
+    background: rgba(255,255,255,0.05); color: #aaa; font-size: 0.65em; font-weight: 600;
+    cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 4px;
   }
-  .kicker-bonus.small-k  { color: #ff2d95; }
-  .kicker-bonus.medium-k { color: #ffaa00; }
-  .kicker-bonus.big-k    { color: #00d2ff; }
+  .share-btn:active { transform: scale(0.95); background: rgba(255,255,255,0.1); color: #fff; }
+  .share-btn svg { width: 14px; height: 14px; fill: currentColor; }
 
-  /* ---- メダルバッジ ---- */
-.medal-badge {
-  position: absolute; top: -18px; right: -14px;
-  width: 72px; height: 72px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 0.48em; font-weight: 900; letter-spacing: 1px;
-  text-transform: uppercase; z-index: 10;
-  text-align: center; line-height: 1.15;
-  animation: medalDrop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-  /* 12頂点の星型 */
-  clip-path: polygon(
-    50% 0%,
-    60.4% 11.4%,
-    75% 6.7%,
-    78.3% 21.7%,
-    93.3% 25%,
-    88.6% 39.6%,
-    100% 50%,
-    88.6% 60.4%,
-    93.3% 75%,
-    78.3% 78.3%,
-    75% 93.3%,
-    60.4% 88.6%,
-    50% 100%,
-    39.6% 88.6%,
-    25% 93.3%,
-    21.7% 78.3%,
-    6.7% 75%,
-    11.4% 60.4%,
-    0% 50%,
-    11.4% 39.6%,
-    6.7% 25%,
-    21.7% 21.7%,
-    25% 6.7%,
-    39.6% 11.4%
-  );
-  /* clip-path使用時はborderが効かないのでdrop-shadowで代替 */
-  filter: drop-shadow(0 3px 8px rgba(0,0,0,0.5));
-}
-  @keyframes medalDrop {
-    0% { transform: scale(0) rotate(-30deg) translateY(-40px); opacity: 0; }
-    100% { transform: scale(1) rotate(0deg) translateY(0); opacity: 1; }
+  /* ---- メダル（12頂点星型） ---- */
+  .medal-badge {
+    position: absolute; top: -18px; right: -14px;
+    width: 72px; height: 72px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.48em; font-weight: 900; letter-spacing: 1px;
+    text-transform: uppercase; z-index: 10;
+    text-align: center; line-height: 1.15;
+    animation: medalDrop 0.6s cubic-bezier(0.34,1.56,0.64,1) both;
+    clip-path: polygon(
+      50% 0%,
+      60.4% 11.4%,
+      75% 6.7%,
+      78.3% 21.7%,
+      93.3% 25%,
+      88.6% 39.6%,
+      100% 50%,
+      88.6% 60.4%,
+      93.3% 75%,
+      78.3% 78.3%,
+      75% 93.3%,
+      60.4% 88.6%,
+      50% 100%,
+      39.6% 88.6%,
+      25% 93.3%,
+      21.7% 78.3%,
+      6.7% 75%,
+      11.4% 60.4%,
+      0% 50%,
+      11.4% 39.6%,
+      6.7% 25%,
+      21.7% 21.7%,
+      25% 6.7%,
+      39.6% 11.4%
+    );
+    filter: drop-shadow(0 3px 8px rgba(0,0,0,0.5));
   }
-  .medal-badge .medal-shine {
-    position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
-    animation: mShine 2s ease-in-out 0.6s;
-  }
-  @keyframes mShine { 0% { left: -100%; } 100% { left: 200%; } }
+  @keyframes medalDrop { 0% { transform: scale(0) rotate(-30deg) translateY(-40px); opacity: 0; } 100% { transform: scale(1) rotate(0deg) translateY(0); opacity: 1; } }
 
-.medal-basic        { background: radial-gradient(circle at 35% 35%, #888, #444); color: #ddd; }
-.medal-nice         { background: radial-gradient(circle at 35% 35%, #5dade2, #1a5276); color: #d6eaf8; }
-.medal-good         { background: radial-gradient(circle at 35% 35%, #58d68d, #1e8449); color: #d5f5e3; }
-.medal-sick         { background: radial-gradient(circle at 35% 35%, #f7dc6f, #b7950b); color: #4a3f00; }
-.medal-dope         { background: radial-gradient(circle at 35% 35%, #f0b27a, #ca6f1e); color: #4a2800; }
-.medal-fire         { background: radial-gradient(circle at 35% 35%, #f1948a, #c0392b); color: #fdedec;
-                      filter: drop-shadow(0 3px 8px rgba(0,0,0,0.5)) drop-shadow(0 0 12px rgba(231,76,60,0.5)); }
-.medal-epic         { background: radial-gradient(circle at 35% 35%, #f48fb1, #c2185b); color: #fce4ec;
-                      filter: drop-shadow(0 3px 8px rgba(0,0,0,0.5)) drop-shadow(0 0 12px rgba(233,30,99,0.5)); }
-.medal-legendary    { background: radial-gradient(circle at 35% 35%, #ce93d8, #6a1b9a); color: #f3e5f5;
-                      filter: drop-shadow(0 3px 8px rgba(0,0,0,0.5)) drop-shadow(0 0 15px rgba(156,39,176,0.5)); }
-.medal-mythic       { background: radial-gradient(circle at 35% 35%, #4dd0e1, #00838f); color: #e0f7fa;
-                      filter: drop-shadow(0 3px 8px rgba(0,0,0,0.5)) drop-shadow(0 0 15px rgba(0,188,212,0.5)); }
-.medal-godlike      { background: radial-gradient(circle at 35% 35%, #ffe082, #b8860b); color: #3e2c00;
-                      filter: drop-shadow(0 3px 8px rgba(0,0,0,0.5)) drop-shadow(0 0 20px rgba(255,215,0,0.6));
-                      animation: medalDrop 0.6s cubic-bezier(0.34,1.56,0.64,1) both, medalGlow 2s ease-in-out infinite; }
-@keyframes medalGlow {
-  0%,100% { filter: drop-shadow(0 3px 8px rgba(0,0,0,0.5)) drop-shadow(0 0 20px rgba(255,215,0,0.5)); }
-  50%     { filter: drop-shadow(0 3px 8px rgba(0,0,0,0.5)) drop-shadow(0 0 35px rgba(255,215,0,0.9)); }
-}
-.medal-transcendent { background: conic-gradient(#ff0000, #ff8800, #ffff00, #00ff00, #0088ff, #8800ff, #ff0000);
-                      color: #fff; text-shadow: 0 0 3px rgba(0,0,0,0.7);
-                      filter: drop-shadow(0 3px 8px rgba(0,0,0,0.5));
-                      animation: medalDrop 0.6s cubic-bezier(0.34,1.56,0.64,1) both, medalSpin 4s linear infinite; }
-@keyframes medalSpin {
-  0%   { background: conic-gradient(from 0deg, #ff0000,#ff8800,#ffff00,#00ff00,#0088ff,#8800ff,#ff0000); }
-  100% { background: conic-gradient(from 360deg, #ff0000,#ff8800,#ffff00,#00ff00,#0088ff,#8800ff,#ff0000); }
-}
-.medal-impossible   { background: radial-gradient(circle at 35% 35%, #fff, #b0bec5, #eceff1); color: #263238;
+  .medal-basic { background: radial-gradient(circle at 35% 35%,#888,#444); color: #ddd; }
+  .medal-nice { background: radial-gradient(circle at 35% 35%,#5dade2,#1a5276); color: #d6eaf8; }
+  .medal-good { background: radial-gradient(circle at 35% 35%,#58d68d,#1e8449); color: #d5f5e3; }
+  .medal-sick { background: radial-gradient(circle at 35% 35%,#f7dc6f,#b7950b); color: #4a3f00; }
+  .medal-dope { background: radial-gradient(circle at 35% 35%,#f0b27a,#ca6f1e); color: #4a2800; }
+  .medal-fire { background: radial-gradient(circle at 35% 35%,#f1948a,#c0392b); color: #fdedec;
+                filter: drop-shadow(0 3px 8px rgba(0,0,0,0.5)) drop-shadow(0 0 12px rgba(231,76,60,0.5)); }
+  .medal-epic { background: radial-gradient(circle at 35% 35%,#f48fb1,#c2185b); color: #fce4ec;
+                filter: drop-shadow(0 3px 8px rgba(0,0,0,0.5)) drop-shadow(0 0 12px rgba(233,30,99,0.5)); }
+  .medal-legendary { background: radial-gradient(circle at 35% 35%,#ce93d8,#6a1b9a); color: #f3e5f5;
+                     filter: drop-shadow(0 3px 8px rgba(0,0,0,0.5)) drop-shadow(0 0 15px rgba(156,39,176,0.5)); }
+  .medal-mythic { background: radial-gradient(circle at 35% 35%,#4dd0e1,#00838f); color: #e0f7fa;
+                  filter: drop-shadow(0 3px 8px rgba(0,0,0,0.5)) drop-shadow(0 0 15px rgba(0,188,212,0.5)); }
+  .medal-godlike { background: radial-gradient(circle at 35% 35%,#ffe082,#b8860b); color: #3e2c00;
+                   filter: drop-shadow(0 3px 8px rgba(0,0,0,0.5)) drop-shadow(0 0 20px rgba(255,215,0,0.6));
+                   animation: medalDrop 0.6s cubic-bezier(0.34,1.56,0.64,1) both, medalGlow 2s ease-in-out infinite; }
+  @keyframes medalGlow {
+    0%,100% { filter: drop-shadow(0 3px 8px rgba(0,0,0,0.5)) drop-shadow(0 0 20px rgba(255,215,0,0.5)); }
+    50% { filter: drop-shadow(0 3px 8px rgba(0,0,0,0.5)) drop-shadow(0 0 35px rgba(255,215,0,0.9)); }
+  }
+  .medal-transcendent { background: conic-gradient(#ff0000,#ff8800,#ffff00,#00ff00,#0088ff,#8800ff,#ff0000);
+                        color: #fff; text-shadow: 0 0 3px rgba(0,0,0,0.7);
+                        filter: drop-shadow(0 3px 8px rgba(0,0,0,0.5));
+                        animation: medalDrop 0.6s cubic-bezier(0.34,1.56,0.64,1) both, medalSpin 4s linear infinite; }
+  @keyframes medalSpin {
+    0% { background: conic-gradient(from 0deg,#ff0000,#ff8800,#ffff00,#00ff00,#0088ff,#8800ff,#ff0000); }
+    100% { background: conic-gradient(from 360deg,#ff0000,#ff8800,#ffff00,#00ff00,#0088ff,#8800ff,#ff0000); }
+  }
+  .medal-impossible { background: radial-gradient(circle at 35% 35%,#fff,#b0bec5,#eceff1); color: #263238;
                       filter: drop-shadow(0 3px 8px rgba(0,0,0,0.5)) drop-shadow(0 0 15px rgba(255,255,255,0.5));
                       animation: medalDrop 0.6s cubic-bezier(0.34,1.56,0.64,1) both, medalGlow2 2s ease-in-out infinite; }
-@keyframes medalGlow2 {
-  0%,100% { filter: drop-shadow(0 3px 8px rgba(0,0,0,0.5)) drop-shadow(0 0 15px rgba(255,255,255,0.4)); }
-  50%     { filter: drop-shadow(0 3px 8px rgba(0,0,0,0.5)) drop-shadow(0 0 30px rgba(255,255,255,0.8)); }
-}
-.medal-beyond       { background: radial-gradient(circle at 30% 30%, #e0f7fa, #4dd0e1, #00838f); color: #004d40;
-                      filter: drop-shadow(0 3px 8px rgba(0,0,0,0.5)) drop-shadow(0 0 20px rgba(178,235,242,0.6));
-                      animation: medalDrop 0.6s cubic-bezier(0.34,1.56,0.64,1) both, medalGlow2 2s ease-in-out infinite; }
-.medal-universe     { background: radial-gradient(circle at 40% 40%, #1a0533, #0d0221, #000); color: #e0e0ff;
-                      text-shadow: 0 0 8px rgba(124,77,255,0.9);
-                      filter: drop-shadow(0 3px 8px rgba(0,0,0,0.5)) drop-shadow(0 0 25px rgba(124,77,255,0.6));
-                      animation: medalDrop 0.6s cubic-bezier(0.34,1.56,0.64,1) both, medalCosmic 3s ease-in-out infinite; }
-@keyframes medalCosmic {
-  0%,100% { filter: drop-shadow(0 3px 8px rgba(0,0,0,0.5)) drop-shadow(0 0 25px rgba(124,77,255,0.5)); }
-  50%     { filter: drop-shadow(0 3px 8px rgba(0,0,0,0.5)) drop-shadow(0 0 45px rgba(124,77,255,0.9)); }
-}
-
-
-  .mini-badge {
-    display: inline-block; padding: 2px 8px; border-radius: 10px;
-    font-size: 0.55em; font-weight: 700; letter-spacing: 1px; margin-top: 3px;
+  @keyframes medalGlow2 {
+    0%,100% { filter: drop-shadow(0 3px 8px rgba(0,0,0,0.5)) drop-shadow(0 0 15px rgba(255,255,255,0.4)); }
+    50% { filter: drop-shadow(0 3px 8px rgba(0,0,0,0.5)) drop-shadow(0 0 30px rgba(255,255,255,0.8)); }
   }
-  .mb-basic { background:#555;color:#ccc; } .mb-nice { background:#1a5276;color:#d6eaf8; }
-  .mb-good { background:#1e8449;color:#d5f5e3; } .mb-sick { background:#b7950b;color:#fef9e7; }
-  .mb-dope { background:#ca6f1e;color:#fdebd0; } .mb-fire { background:#c0392b;color:#fdedec; }
-  .mb-epic { background:#c2185b;color:#fce4ec; } .mb-legendary { background:#6a1b9a;color:#f3e5f5; }
-  .mb-mythic { background:#00838f;color:#e0f7fa; } .mb-godlike { background:#b8860b;color:#fff8dc; }
-  .mb-transcendent { background:linear-gradient(90deg,#f00,#f80,#ff0,#0f0,#08f,#80f);color:#fff;text-shadow:0 0 2px rgba(0,0,0,0.5); }
-  .mb-impossible { background:linear-gradient(135deg,#b0bec5,#eceff1);color:#263238; }
-  .mb-beyond { background:linear-gradient(135deg,#4dd0e1,#00838f);color:#e0f7fa; }
-  .mb-universe { background:#0d0221;color:#c0c0ff;border:1px solid #7c4dff; }
-
-  .phase-label {
-    font-size: 0.75em; text-transform: uppercase;
-    letter-spacing: 3px; margin-bottom: 6px; color: #888;
-  }
-  .phase-label.cd    { color: #ffaa00; }
-  .phase-label.rec   { color: #ff3366; }
-  .phase-label.done  { color: #00ff88; }
-  .phase-label.crash { color: #ff4444; }
-
-  .big-text { font-size: 3.5em; font-weight: 900; line-height: 1.1; margin-bottom: 4px; }
-  .big-text.countdown-num {
-    background: linear-gradient(135deg, #ffaa00, #ff6600);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-  }
-  .big-text.go {
-    background: linear-gradient(135deg, #ff3366, #ff0099);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-  }
-  .big-text.trick {
-    font-size: 1.6em;
-    background: linear-gradient(135deg, #00ff88, #00d2ff);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-  }
-  .big-text.fail {
-    font-size: 1.6em;
-    background: linear-gradient(135deg, #ff4444, #ff6600);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-  }
-  .big-text.idle {
-    font-size: 1.1em; color: #aaa; font-weight: 400; -webkit-text-fill-color: #aaa;
+  .medal-beyond { background: radial-gradient(circle at 30% 30%,#e0f7fa,#4dd0e1,#00838f); color: #004d40;
+                  filter: drop-shadow(0 3px 8px rgba(0,0,0,0.5)) drop-shadow(0 0 20px rgba(178,235,242,0.6));
+                  animation: medalDrop 0.6s cubic-bezier(0.34,1.56,0.64,1) both, medalGlow2 2s ease-in-out infinite; }
+  .medal-universe { background: radial-gradient(circle at 40% 40%,#1a0533,#0d0221,#000); color: #e0e0ff;
+                    text-shadow: 0 0 8px rgba(124,77,255,0.9);
+                    filter: drop-shadow(0 3px 8px rgba(0,0,0,0.5)) drop-shadow(0 0 25px rgba(124,77,255,0.6));
+                    animation: medalDrop 0.6s cubic-bezier(0.34,1.56,0.64,1) both, medalCosmic 3s ease-in-out infinite; }
+  @keyframes medalCosmic {
+    0%,100% { filter: drop-shadow(0 3px 8px rgba(0,0,0,0.5)) drop-shadow(0 0 25px rgba(124,77,255,0.5)); }
+    50% { filter: drop-shadow(0 3px 8px rgba(0,0,0,0.5)) drop-shadow(0 0 45px rgba(124,77,255,0.9)); }
   }
 
-  .sub-text { font-size: 0.75em; color: #999; margin-top: 4px; line-height: 1.5; }
+  .mini-badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.55em; font-weight: 700; letter-spacing: 1px; margin-top: 2px; }
+  .mb-basic{background:#555;color:#ccc;}.mb-nice{background:#1a5276;color:#d6eaf8;}.mb-good{background:#1e8449;color:#d5f5e3;}
+  .mb-sick{background:#b7950b;color:#fef9e7;}.mb-dope{background:#ca6f1e;color:#fdebd0;}.mb-fire{background:#c0392b;color:#fdedec;}
+  .mb-epic{background:#c2185b;color:#fce4ec;}.mb-legendary{background:#6a1b9a;color:#f3e5f5;}.mb-mythic{background:#00838f;color:#e0f7fa;}
+  .mb-godlike{background:#b8860b;color:#fff8dc;}
+  .mb-transcendent{background:linear-gradient(90deg,#f00,#f80,#ff0,#0f0,#08f,#80f);color:#fff;text-shadow:0 0 2px rgba(0,0,0,0.5);}
+  .mb-impossible{background:linear-gradient(135deg,#b0bec5,#eceff1);color:#263238;}
+  .mb-beyond{background:linear-gradient(135deg,#4dd0e1,#00838f);color:#e0f7fa;}
+  .mb-universe{background:#0d0221;color:#c0c0ff;border:1px solid #7c4dff;}
 
-  /* ---- 姿勢メーター ---- */
-  .posture-indicator { margin: 12px auto 0; display: none; width: 92%; max-width: 310px; }
+  /* ---- 姿勢メーター（コンパクト化） ---- */
+  .posture-indicator { margin: 8px auto 0; display: none; width: 92%; max-width: 310px; }
   .posture-indicator.show { display: block; }
-  .posture-row { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
-  .posture-label { font-size: 0.6em; color: #888; width: 36px; text-align: right; flex-shrink: 0; }
+  .posture-row { display: flex; align-items: center; gap: 4px; margin-bottom: 6px; }
+  .posture-label { font-size: 0.55em; color: #888; width: 32px; text-align: right; flex-shrink: 0; }
   .meter-wrap { flex: 1; position: relative; }
-  .meter-bar { height: 8px; background: rgba(255,255,255,0.08); border-radius: 4px; position: relative; overflow: hidden; }
-  .meter-safe { position: absolute; height: 100%; background: rgba(0,255,136,0.12); border-radius: 4px; }
-  .meter-marker { position: absolute; top: -3px; width: 4px; height: 14px; border-radius: 2px; transition: left 0.15s ease; }
+  .meter-bar { height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; position: relative; overflow: hidden; }
+  .meter-safe { position: absolute; height: 100%; background: rgba(0,255,136,0.12); border-radius: 3px; }
+  .meter-marker { position: absolute; top: -3px; width: 4px; height: 12px; border-radius: 2px; transition: left 0.15s ease; }
   .meter-ticks { position: relative; height: 10px; margin-top: 1px; }
-  .meter-tick { position: absolute; top: 0; width: 1px; height: 5px; background: rgba(255,255,255,0.2); }
-  .meter-tick.major { height: 8px; background: rgba(255,255,255,0.4); }
-  .meter-tick-label { position: absolute; top: 9px; font-size: 0.45em; color: #666; transform: translateX(-50%); }
-  .meter-threshold { position: absolute; top: 0; width: 2px; height: 8px; border-radius: 1px; }
+  .meter-tick { position: absolute; top: 0; width: 1px; height: 4px; background: rgba(255,255,255,0.2); }
+  .meter-tick.major { height: 7px; background: rgba(255,255,255,0.4); }
+  .meter-tick-label { position: absolute; top: 8px; font-size: 0.4em; color: #666; transform: translateX(-50%); }
+  .meter-threshold { position: absolute; top: 0; width: 2px; height: 7px; border-radius: 1px; }
   .meter-threshold.ok { background: rgba(0,255,136,0.5); }
-  .posture-val { font-size: 0.6em; color: #aaa; width: 36px; text-align: left; flex-shrink: 0; }
-  .posture-status { font-size: 0.75em; font-weight: 700; text-align: center; margin-top: 2px; letter-spacing: 2px; }
+  .posture-val { font-size: 0.55em; color: #aaa; width: 32px; text-align: left; flex-shrink: 0; }
+  .posture-status { font-size: 0.7em; font-weight: 700; text-align: center; margin-top: 2px; letter-spacing: 2px; }
 
-  /* ---- データカード ---- */
-  .live-data { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 14px; }
-  .data-card { background: rgba(255,255,255,0.05); border-radius: 12px; padding: 10px 4px; }
-  .data-card .label { font-size: 0.6em; color: #888; margin-bottom: 2px; }
-  .data-card .value { font-size: 1.2em; font-weight: 700; }
+  /* ---- データ（コンパクト化） ---- */
+  .live-data { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 8px; }
+  .data-card { background: rgba(255,255,255,0.05); border-radius: 10px; padding: 6px 4px; }
+  .data-card .label { font-size: 0.55em; color: #888; margin-bottom: 1px; }
+  .data-card .value { font-size: 1.1em; font-weight: 700; }
   .data-card .value.recording { color: #ff3366; }
 
-  /* ---- キッカーセレクタ ---- */
-  .kicker-selector { display: flex; gap: 8px; justify-content: center; margin-bottom: 14px; }
+  /* ---- キッカー ---- */
+  .kicker-selector { display: flex; gap: 6px; justify-content: center; margin-bottom: 8px; }
   .kicker-opt {
-    flex: 1; padding: 10px 4px; border: 2px solid rgba(255,255,255,0.15);
-    border-radius: 12px; background: transparent; color: #aaa;
-    font-size: 0.85em; font-weight: 600; cursor: pointer; transition: all 0.2s;
-    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    flex: 1; padding: 8px 4px; border: 2px solid rgba(255,255,255,0.15);
+    border-radius: 10px; background: transparent; color: #aaa;
+    font-size: 0.8em; font-weight: 600; cursor: pointer; transition: all 0.2s;
+    display: flex; flex-direction: column; align-items: center; gap: 1px;
   }
   .kicker-opt.active { border-color: #7b2ff7; color: #fff; background: rgba(123,47,247,0.2); }
-  .kicker-opt .k-icon { font-size: 1.4em; line-height: 1; }
-  .kicker-opt .k-name { font-size: 0.85em; }
-  .kicker-opt .k-bonus { font-size: 0.6em; opacity: 0.6; }
+  .kicker-opt .k-icon { font-size: 1.2em; line-height: 1; }
+  .kicker-opt .k-name { font-size: 0.8em; }
 
-  /* ---- 管理者チートパネル ---- */
-  .cheat-panel {
-    display: none; margin-bottom: 14px;
-    background: rgba(255,0,0,0.05); border: 1px solid rgba(255,0,0,0.2);
-    border-radius: 12px; padding: 10px;
-  }
+  /* ---- チートパネル ---- */
+  .cheat-panel { display: none; margin-bottom: 8px; background: rgba(255,0,0,0.05); border: 1px solid rgba(255,0,0,0.2); border-radius: 10px; padding: 8px; }
   .cheat-panel.show { display: block; }
-  .cheat-panel .cp-title {
-    font-size: 0.7em; color: #ff4444; letter-spacing: 2px;
-    text-transform: uppercase; margin-bottom: 8px;
-  }
+  .cheat-panel .cp-title { font-size: 0.65em; color: #ff4444; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; }
   .cheat-panel .cp-row { display: flex; align-items: center; gap: 8px; }
   .cheat-panel input[type=range] { flex: 1; accent-color: #ff4444; }
-  .cheat-panel .cp-val { font-size: 0.85em; font-weight: 700; color: #ff8888; width: 40px; text-align: center; }
+  .cheat-panel .cp-val { font-size: 0.8em; font-weight: 700; color: #ff8888; width: 36px; text-align: center; }
 
   .btn {
-    width: 100%; padding: 16px; border: none; border-radius: 14px;
-    font-size: 1.15em; font-weight: 700; cursor: pointer;
-    transition: all 0.2s; margin-bottom: 10px;
+    width: 100%; padding: 14px; border: none; border-radius: 12px;
+    font-size: 1.1em; font-weight: 700; cursor: pointer; transition: all 0.2s; margin-bottom: 8px;
   }
   .btn-go { background: linear-gradient(135deg, #00d2ff, #7b2ff7); color: #fff; }
   .btn-go:active { transform: scale(0.97); }
   .btn-go:disabled { background: #333; color: #555; cursor: not-allowed; }
 
   /* ---- 履歴 ---- */
-  .history { text-align: left; margin-top: 10px; }
-  .history h3 { font-size: 0.8em; color: #666; margin-bottom: 8px; letter-spacing: 2px; text-transform: uppercase; }
+  .history { text-align: left; margin-top: 8px; }
+  .history-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+  .history-header h3 { font-size: 0.75em; color: #666; letter-spacing: 2px; text-transform: uppercase; }
+  .hist-actions { display: flex; gap: 6px; }
+  .hist-act-btn {
+    padding: 4px 10px; border: 1px solid rgba(255,255,255,0.15); border-radius: 6px;
+    background: transparent; color: #888; font-size: 0.6em; cursor: pointer; transition: all 0.2s;
+  }
+  .hist-act-btn:active { background: rgba(255,255,255,0.1); }
+  .hist-act-btn.danger { border-color: rgba(255,68,68,0.3); color: #ff6666; }
+  .hist-act-btn.danger:active { background: rgba(255,68,68,0.1); }
+
   .h-item {
     background: rgba(255,255,255,0.04); border-radius: 10px;
-    padding: 10px 14px; margin-bottom: 6px;
+    padding: 8px 12px; margin-bottom: 5px;
     display: flex; justify-content: space-between; align-items: center;
-    animation: slideIn 0.3s ease;
+    animation: slideIn 0.3s ease; position: relative;
   }
   .h-item.fail-item { border-left: 3px solid #ff4444; }
+  .h-item.selected { border: 1px solid #ff4444; background: rgba(255,68,68,0.08); }
   @keyframes slideIn { from { opacity:0; transform:translateX(-20px); } to { opacity:1; transform:translateX(0); } }
-  .h-trick { font-weight: 700; font-size: 0.9em; }
-  .h-trick.fail-text { color: #ff6666; }
-  .h-info { font-size: 0.65em; color: #888; margin-top: 2px; }
-  .h-score-col { text-align: right; }
-  .h-score {
-    border-radius: 8px; padding: 4px 10px;
-    font-weight: 700; font-size: 0.8em; white-space: nowrap;
+
+  .h-check {
+    position: absolute; left: -4px; top: 50%; transform: translateY(-50%);
+    width: 18px; height: 18px; border-radius: 4px; border: 2px solid rgba(255,255,255,0.2);
+    background: transparent; cursor: pointer; display: none; transition: all 0.2s;
   }
+  .h-item.sel-mode .h-check { display: block; }
+  .h-check.checked { background: #ff4444; border-color: #ff4444; }
+  .h-check.checked::after { content: '✓'; color: #fff; font-size: 0.7em; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; }
+
+  .h-content { flex: 1; min-width: 0; }
+  .h-item.sel-mode .h-content { margin-left: 18px; }
+  .h-trick { font-weight: 700; font-size: 0.85em; }
+  .h-trick.fail-text { color: #ff6666; }
+  .h-info { font-size: 0.6em; color: #888; margin-top: 1px; }
+  .h-kicker { font-size: 0.5em; color: #666; margin-top: 1px; }
+  .h-score-col { text-align: right; flex-shrink: 0; }
+  .h-score { border-radius: 8px; padding: 3px 8px; font-weight: 700; font-size: 0.75em; white-space: nowrap; }
   .h-score.success { background: linear-gradient(135deg, #ff6b35, #ff2d95); }
   .h-score.crashed-score { background: rgba(255,68,68,0.3); color: #ff6666; }
-  .h-rank { font-size: 0.6em; color: #888; margin-top: 2px; }
-  .h-kicker { font-size: 0.55em; color: #666; margin-top: 1px; }
+  .h-rank { font-size: 0.55em; color: #888; margin-top: 1px; }
 
   .debug-panel {
-    background: rgba(255,255,255,0.03); border-radius: 12px;
-    padding: 10px; margin-top: 10px; text-align: left;
-    font-size: 0.6em; color: #666; font-family: monospace; line-height: 1.6;
+    background: rgba(255,255,255,0.03); border-radius: 10px;
+    padding: 8px; margin-top: 8px; text-align: left;
+    font-size: 0.55em; color: #666; font-family: monospace; line-height: 1.5;
   }
   .debug-panel .dt { color: #888; }
 
-  .notes { font-size: 0.65em; color: #555; margin-top: 14px; line-height: 1.6; }
+  .notes { font-size: 0.6em; color: #555; margin-top: 10px; line-height: 1.5; }
+
+  /* ---- トースト ---- */
+  .toast {
+    position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+    background: rgba(0,0,0,0.85); color: #fff; padding: 10px 20px; border-radius: 10px;
+    font-size: 0.8em; z-index: 100; opacity: 0; transition: opacity 0.3s;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; }
 </style>
 </head>
 <body>
@@ -356,44 +309,37 @@
 <div class="snow-container" id="snowContainer"></div>
 
 <div class="app">
-  <h1>SPIN TRICK JUDGE</h1>
-  <p class="ver">v9 - Kicker Size</p>
+  <h1 id="appTitle">SPIN TRICK JUDGE</h1>
+  <p class="ver">v10</p>
 
   <div class="main-display" id="mainDisplay">
     <div id="medalContainer"></div>
     <div class="phase-label" id="phaseLabel">READY</div>
     <div class="big-text idle" id="bigText">キッカーを選んで<br>START！</div>
     <div class="sub-text" id="subText"></div>
-
-    <!-- スコア表示 -->
     <div class="score-display" id="scoreDisplay">
       <div class="score-label">SCORE</div>
       <div class="score-number" id="scoreNumber">0</div>
     </div>
-
+    <div class="share-row" id="shareRow" style="display:none;">
+      <button class="share-btn" onclick="shareResult('x')"><svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>Post</button>
+      <button class="share-btn" onclick="shareResult('copy')"><svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>Copy</button>
+      <button class="share-btn" onclick="shareResult('image')"><svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>Save</button>
+    </div>
     <div class="posture-indicator" id="postureInd">
       <div class="posture-row">
         <span class="posture-label">Spin</span>
-        <div class="meter-wrap">
-          <div class="meter-bar"><div class="meter-safe" id="spinSafe"></div><div class="meter-marker" id="spinMarker"></div></div>
-          <div class="meter-ticks" id="spinTicks"></div>
-        </div>
+        <div class="meter-wrap"><div class="meter-bar"><div class="meter-safe" id="spinSafe"></div><div class="meter-marker" id="spinMarker"></div></div><div class="meter-ticks" id="spinTicks"></div></div>
         <span class="posture-val" id="spinVal">0°</span>
       </div>
       <div class="posture-row">
         <span class="posture-label">Pitch</span>
-        <div class="meter-wrap">
-          <div class="meter-bar"><div class="meter-safe" id="pitchSafe"></div><div class="meter-marker" id="pitchMarker"></div></div>
-          <div class="meter-ticks" id="pitchTicks"></div>
-        </div>
+        <div class="meter-wrap"><div class="meter-bar"><div class="meter-safe" id="pitchSafe"></div><div class="meter-marker" id="pitchMarker"></div></div><div class="meter-ticks" id="pitchTicks"></div></div>
         <span class="posture-val" id="pitchVal">0°</span>
       </div>
       <div class="posture-row">
         <span class="posture-label">Roll</span>
-        <div class="meter-wrap">
-          <div class="meter-bar"><div class="meter-safe" id="rollSafe"></div><div class="meter-marker" id="rollMarker"></div></div>
-          <div class="meter-ticks" id="rollTicks"></div>
-        </div>
+        <div class="meter-wrap"><div class="meter-bar"><div class="meter-safe" id="rollSafe"></div><div class="meter-marker" id="rollMarker"></div></div><div class="meter-ticks" id="rollTicks"></div></div>
         <span class="posture-val" id="rollVal">0°</span>
       </div>
       <div class="posture-status" id="postureStatus">-</div>
@@ -411,39 +357,28 @@
     <div class="data-card"><div class="label">Peak °/s</div><div class="value" id="vPeak">0</div></div>
   </div>
 
-  <!-- キッカーセレクタ -->
   <div class="kicker-selector" id="kickerSelector">
-    <button class="kicker-opt" data-kicker="small" onclick="pickKicker(this)">
-      <span class="k-icon">&#9650;</span>
-      <span class="k-name">Small</span>
-      <span class="k-bonus">Airtime:1.5s</span>
-    </button>
-    <button class="kicker-opt active" data-kicker="medium" onclick="pickKicker(this)">
-      <span class="k-icon">&#9650;&#9650;</span>
-      <span class="k-name">Medium</span>
-      <span class="k-bonus">Airtime:2.0s</span>
-    </button>
-    <button class="kicker-opt" data-kicker="big" onclick="pickKicker(this)">
-      <span class="k-icon">&#9650;&#9650;&#9650;</span>
-      <span class="k-name">Big</span>
-      <span class="k-bonus">Airtime:2.5s</span>
-    </button>
+    <button class="kicker-opt" data-kicker="small" onclick="pickKicker(this)"><span class="k-icon">&#9650;</span><span class="k-name">Small</span></button>
+    <button class="kicker-opt active" data-kicker="medium" onclick="pickKicker(this)"><span class="k-icon">&#9650;&#9650;</span><span class="k-name">Medium</span></button>
+    <button class="kicker-opt" data-kicker="big" onclick="pickKicker(this)"><span class="k-icon">&#9650;&#9650;&#9650;</span><span class="k-name">Big</span></button>
   </div>
 
-  <!-- 管理者チートパネル -->
   <div class="cheat-panel" id="cheatPanel">
     <div class="cp-title">Admin - Custom Duration</div>
-    <div class="cp-row">
-      <input type="range" id="cheatSlider" min="5.0" max="30.0" step="5.0" value="15.0"
-             oninput="onCheatSlider(this.value)">
-      <span class="cp-val" id="cheatVal">15.0s</span>
-    </div>
+    <div class="cp-row"><input type="range" id="cheatSlider" min="5.0" max="40.0" step="5.0" value="20.0" oninput="onCheatSlider(this.value)"><span class="cp-val" id="cheatVal">20.0s</span></div>
   </div>
 
   <button class="btn btn-go" id="btnGo" onclick="go()">START</button>
 
   <div class="history" id="histSec" style="display:none;">
-    <h3>Trick History</h3>
+    <div class="history-header">
+      <h3>Trick History</h3>
+      <div class="hist-actions">
+        <button class="hist-act-btn" id="btnSelMode" onclick="toggleSelMode()">Select</button>
+        <button class="hist-act-btn danger" id="btnDelSel" onclick="deleteSelected()" style="display:none;">Delete</button>
+        <button class="hist-act-btn danger" id="btnDelAll" onclick="deleteAll()" style="display:none;">All Clear</button>
+      </div>
+    </div>
     <div id="histList"></div>
   </div>
 
@@ -451,409 +386,326 @@
     <div><span class="dt">rotationRate:</span> <span id="dbRate">-</span></div>
     <div><span class="dt">interval:</span> <span id="dbInt">-</span> ms</div>
     <div><span class="dt">integrated:</span> S=<span id="dbSpin">0</span> P=<span id="dbPitch">0</span> R=<span id="dbRoll">0</span></div>
-    <div><span class="dt">pitch landing:</span> <span id="dbPL">-</span></div>
-    <div><span class="dt">roll landing:</span> <span id="dbRL">-</span></div>
+    <div><span class="dt">pitch:</span> <span id="dbPL">-</span></div>
+    <div><span class="dt">roll:</span> <span id="dbRL">-</span></div>
     <div><span class="dt">upright:</span> <span id="dbUpright">-</span></div>
     <div><span class="dt">samples:</span> <span id="dbSamples">0</span></div>
   </div>
 
   <p class="notes">
-    ※ スマホを投げる際は周囲の安全を確認し、柔らかい場所で遊んでください<br>
+    ※ スマホを投げる際は周囲の安全を確認してください<br>
     ※ iOS は初回のみセンサー許可ダイアログが表示されます
   </p>
 </div>
 
+<div class="toast" id="toast"></div>
+
 <script>
 // ============================================================
-//  定数
-// ============================================================
-const COUNTDOWN_SEC     = 3;
-const SPIN_THRESHOLD    = 45;
-const LANDING_THRESHOLD = 60;
+const COUNTDOWN_SEC=3, SPIN_THRESHOLD=45, LANDING_THRESHOLD=60;
+const STORAGE_KEY='spinTrickHistory_v10';
 
-// ---- キッカー設定（パラメータ化） ----
-const KICKERS = {
-  small:  { sec: 1.5, multiplier: 0.15, label: 'Small Kicker',  cls: 'small-k'  },
-  medium: { sec: 2.0, multiplier: 0.2, label: 'Medium Kicker', cls: 'medium-k' },
-  big:    { sec: 2.5, multiplier: 0.25, label: 'Big Kicker',    cls: 'big-k'    },
+const KICKERS={
+  small:  { sec:1.5, multiplier:0.25, label:'Small Kicker',  cls:'small-k'  },
+  medium: { sec:2.0, multiplier:0.2, label:'Medium Kicker', cls:'medium-k' },
+  big:    { sec:2.5, multiplier:0.15, label:'Big Kicker',    cls:'big-k'    },
 };
 
-const TITLE_TABLE = [
-  { min:2700, label:'善きかな',     medal:'medal-universe',     mb:'mb-universe' },
-  { min:2520, label:'UNIVERSE',     medal:'medal-universe',     mb:'mb-universe' },
-  { min:2340, label:'BEYOND',       medal:'medal-beyond',       mb:'mb-beyond' },
-  { min:2160, label:'IMPOSSIBLE',   medal:'medal-impossible',   mb:'mb-impossible' },
-  { min:1980, label:'TRANSCENDENT', medal:'medal-transcendent', mb:'mb-transcendent' },
-  { min:1800, label:'GODLIKE',      medal:'medal-godlike',      mb:'mb-godlike' },
-  { min:1620, label:'MYTHIC',       medal:'medal-mythic',       mb:'mb-mythic' },
-  { min:1440, label:'LEGENDARY',    medal:'medal-legendary',    mb:'mb-legendary' },
-  { min:1260, label:'EPIC',         medal:'medal-epic',         mb:'mb-epic' },
-  { min:1080, label:'INSANE',         medal:'medal-fire',         mb:'mb-fire' },
-  { min: 900, label:'DOPE',         medal:'medal-dope',         mb:'mb-dope' },
-  { min: 720, label:'GREAT',         medal:'medal-sick',         mb:'mb-sick' },
-  { min: 540, label:'GOOD',         medal:'medal-good',         mb:'mb-good' },
-  { min: 360, label:'NICE',         medal:'medal-nice',         mb:'mb-nice' },
-  { min: 180, label:'SOSO',        medal:'medal-basic',        mb:'mb-basic' },
+const TITLE_TABLE=[
+  {min:2700,label:'YOKI-KANA',medal:'medal-universe',mb:'mb-universe'},
+  {min:2520,label:'UNIVERSE',medal:'medal-universe',mb:'mb-universe'},
+  {min:2340,label:'BEYOND',medal:'medal-beyond',mb:'mb-beyond'},
+  {min:2160,label:'IMPOSSIBLE',medal:'medal-impossible',mb:'mb-impossible'},
+  {min:1980,label:'TRANSCENDENT',medal:'medal-transcendent',mb:'mb-transcendent'},
+  {min:1800,label:'GODLIKE',medal:'medal-godlike',mb:'mb-godlike'},
+  {min:1620,label:'MYTHIC',medal:'medal-mythic',mb:'mb-mythic'},
+  {min:1440,label:'LEGENDARY',medal:'medal-legendary',mb:'mb-legendary'},
+  {min:1260,label:'EPIC',medal:'medal-epic',mb:'mb-epic'},
+  {min:1080,label:'FIRE',medal:'medal-fire',mb:'mb-fire'},
+  {min:900,label:'DOPE',medal:'medal-dope',mb:'mb-dope'},
+  {min:720,label:'GREAT',medal:'medal-sick',mb:'mb-sick'},
+  {min:540,label:'GOOD',medal:'medal-good',mb:'mb-good'},
+  {min:360,label:'NICE',medal:'medal-nice',mb:'mb-nice'},
+  {min:180,label:'SOSO',medal:'medal-basic',mb:'mb-basic'},
 ];
-function getTitleForDeg(d) { for (const t of TITLE_TABLE) if (d >= t.min) return t; return null; }
+function getTitleForDeg(d){for(const t of TITLE_TABLE)if(d>=t.min)return t;return null;}
 
-// ============================================================
-//  状態
-// ============================================================
-let currentKicker = 'medium';
-let cheatMode     = false;
-let cheatSec      = 15.0;
-let phase         = 'idle';
-let recStart = 0, prevTime = 0;
-let integrated = { pitch:0, roll:0, spin:0 };
-let sampleCount = 0, peakRate = 0;
-let rafId = null, history = [], sensorReady = false;
+let currentKicker='medium',cheatMode=false,cheatSec=20.0;
+let phase='idle',recStart=0,prevTime=0;
+let integrated={pitch:0,roll:0,spin:0},sampleCount=0,peakRate=0;
+let rafId=null,history=[],sensorReady=false;
+let selMode=false,selectedIds=new Set();
+let lastResult=null; // シェア用
+let titleTaps=0,titleTimer=null;
 
-// チート起動用: タイトルを5回タップ
-let titleTaps = 0, titleTimer = null;
-
-// ============================================================
-//  DOM
-// ============================================================
 const $=id=>document.getElementById(id);
 const $disp=$('mainDisplay'),$phase=$('phaseLabel'),$big=$('bigText'),$sub=$('subText');
-const $medal=$('medalContainer');
-const $scoreDsp=$('scoreDisplay'),$scoreNum=$('scoreNumber'),$kickerBns=$('kickerBonus');
+const $medal=$('medalContainer'),$scoreDsp=$('scoreDisplay'),$scoreNum=$('scoreNumber');
+const $shareRow=$('shareRow');
 const $vSpin=$('vSpin'),$vPitch=$('vPitch'),$vRoll=$('vRoll');
 const $vTime=$('vTime'),$vPosture=$('vPosture'),$vPeak=$('vPeak');
 const $btn=$('btnGo'),$hSec=$('histSec'),$hList=$('histList');
 const $postInd=$('postureInd'),$postStatus=$('postureStatus');
 const $cheatPanel=$('cheatPanel'),$cheatSlider=$('cheatSlider'),$cheatVal=$('cheatVal');
+const $toast=$('toast');
 
-// ============================================================
-//  チートモード起動（タイトル5連打）
-// ============================================================
-document.querySelector('h1').addEventListener('click', () => {
-  titleTaps++;
-  clearTimeout(titleTimer);
-  titleTimer = setTimeout(() => { titleTaps = 0; }, 2000);
-  if (titleTaps >= 5) {
-    cheatMode = !cheatMode;
-    $cheatPanel.classList.toggle('show', cheatMode);
-    titleTaps = 0;
-    if (cheatMode) {
-      $cheatSlider.value = getMeasureSec();
-      $cheatVal.textContent = getMeasureSec().toFixed(1) + 's';
-    }
-  }
+// ---- LocalStorage ----
+function saveHistory(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(history));}catch(e){}}
+function loadHistory(){try{const d=localStorage.getItem(STORAGE_KEY);if(d){history=JSON.parse(d);history.forEach((h,i)=>{if(!h.id)h.id=Date.now()+i;});renderHist();}}catch(e){}}
+
+// ---- Toast ----
+function showToast(msg,ms=2000){$toast.textContent=msg;$toast.classList.add('show');setTimeout(()=>$toast.classList.remove('show'),ms);}
+
+// ---- チート ----
+$('appTitle').addEventListener('click',()=>{
+  titleTaps++;clearTimeout(titleTimer);
+  titleTimer=setTimeout(()=>{titleTaps=0;},2000);
+  if(titleTaps>=5){cheatMode=!cheatMode;$cheatPanel.classList.toggle('show',cheatMode);titleTaps=0;
+    if(cheatMode){$cheatSlider.value=getMeasureSec();$cheatVal.textContent=getMeasureSec().toFixed(1)+'s';}}
 });
+function onCheatSlider(v){cheatSec=parseFloat(v);$cheatVal.textContent=cheatSec.toFixed(1)+'s';}
+function getMeasureSec(){return cheatMode?cheatSec:KICKERS[currentKicker].sec;}
 
-function onCheatSlider(val) {
-  cheatSec = parseFloat(val);
-  $cheatVal.textContent = cheatSec.toFixed(1) + 's';
+function pickKicker(el){
+  if(phase!=='idle')return;
+  document.querySelectorAll('.kicker-opt').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');currentKicker=el.dataset.kicker;
+  if(cheatMode){$cheatSlider.value=KICKERS[currentKicker].sec;$cheatVal.textContent=KICKERS[currentKicker].sec.toFixed(1)+'s';cheatSec=KICKERS[currentKicker].sec;}
 }
 
-function getMeasureSec() {
-  if (cheatMode) return cheatSec;
-  return KICKERS[currentKicker].sec;
-}
+// ---- メーター ----
+function initMeter(tid,th){const c=$(tid);c.innerHTML='';[-90,-60,-45,-30,0,30,45,60,90].forEach(d=>{const p=((d+90)/180)*100;const maj=d===0||Math.abs(d)===90;const ist=Math.abs(d)===th;if(ist){const t=document.createElement('div');t.className='meter-threshold ok';t.style.left=p+'%';c.appendChild(t);}const tk=document.createElement('div');tk.className='meter-tick'+(maj?' major':'');tk.style.left=p+'%';c.appendChild(tk);if(maj||ist){const l=document.createElement('div');l.className='meter-tick-label';l.style.left=p+'%';l.textContent=(d>0?'+':'')+d+'°';c.appendChild(l);}});}
+function initSZ(sid,th){const e=$(sid);const l=(((-th)+90)/180)*100;const r=(((th)+90)/180)*100;e.style.left=l+'%';e.style.width=(r-l)+'%';}
+initMeter('spinTicks',SPIN_THRESHOLD);initMeter('pitchTicks',LANDING_THRESHOLD);initMeter('rollTicks',LANDING_THRESHOLD);
+initSZ('spinSafe',SPIN_THRESHOLD);initSZ('pitchSafe',LANDING_THRESHOLD);initSZ('rollSafe',LANDING_THRESHOLD);
 
-// ============================================================
-//  キッカー選択
-// ============================================================
-function pickKicker(el) {
-  if (phase !== 'idle') return;
-  document.querySelectorAll('.kicker-opt').forEach(b => b.classList.remove('active'));
-  el.classList.add('active');
-  currentKicker = el.dataset.kicker;
-  if (cheatMode) {
-    $cheatSlider.value = KICKERS[currentKicker].sec;
-    $cheatVal.textContent = KICKERS[currentKicker].sec.toFixed(1) + 's';
-    cheatSec = KICKERS[currentKicker].sec;
-  }
-}
+// ---- 雪 ----
+(function(){const c=$('snowContainer');for(let i=0;i<20;i++){const s=document.createElement('div');s.className='snowflake';s.textContent='\u2744';s.style.left=Math.random()*100+'%';s.style.fontSize=(8+Math.random()*10)+'px';s.style.opacity=0.3+Math.random()*0.4;s.style.animationDuration=(5+Math.random()*10)+'s';s.style.animationDelay=Math.random()*8+'s';c.appendChild(s);}})();
 
-// ============================================================
-//  メーター初期化
-// ============================================================
-function initMeter(ticksId, threshold) {
-  const c = $(ticksId); c.innerHTML = '';
-  [-90,-60,-45,-30,0,30,45,60,90].forEach(deg => {
-    const pct = ((deg+90)/180)*100;
-    const isMajor = deg===0||Math.abs(deg)===90;
-    const isThresh = Math.abs(deg)===threshold;
-    if (isThresh) {
-      const th = document.createElement('div');
-      th.className = 'meter-threshold ok'; th.style.left = pct+'%'; c.appendChild(th);
-    }
-    const tick = document.createElement('div');
-    tick.className = 'meter-tick'+(isMajor?' major':''); tick.style.left = pct+'%'; c.appendChild(tick);
-    if (isMajor||isThresh) {
-      const lbl = document.createElement('div');
-      lbl.className = 'meter-tick-label'; lbl.style.left = pct+'%';
-      lbl.textContent = (deg>0?'+':'')+deg+'°'; c.appendChild(lbl);
-    }
-  });
-}
-function initSafeZone(safeId, threshold) {
-  const el=$(safeId); const l=(((-threshold)+90)/180)*100; const r=(((threshold)+90)/180)*100;
-  el.style.left=l+'%'; el.style.width=(r-l)+'%';
-}
-initMeter('spinTicks',SPIN_THRESHOLD); initMeter('pitchTicks',LANDING_THRESHOLD); initMeter('rollTicks',LANDING_THRESHOLD);
-initSafeZone('spinSafe',SPIN_THRESHOLD); initSafeZone('pitchSafe',LANDING_THRESHOLD); initSafeZone('rollSafe',LANDING_THRESHOLD);
-
-// ============================================================
-//  雪
-// ============================================================
-(function(){const c=$('snowContainer');for(let i=0;i<25;i++){const s=document.createElement('div');s.className='snowflake';s.textContent='\u2744';s.style.left=Math.random()*100+'%';s.style.fontSize=(8+Math.random()*12)+'px';s.style.opacity=0.3+Math.random()*0.4;s.style.animationDuration=(5+Math.random()*10)+'s';s.style.animationDelay=Math.random()*8+'s';c.appendChild(s);}})();
-
-// ============================================================
-//  着地判定
-// ============================================================
-function axisLandingState(deg){const a=Math.abs(deg),seg=Math.round(a/180),n=seg*180;return{deviation:a-n,flipped:(seg%2)===1,segment:seg};}
-function checkLandingPosture(p,r){const ps=axisLandingState(p),rs=axisLandingState(r);const u=((ps.flipped?1:0)+(rs.flipped?1:0))%2===0;return{isUpright:u,pitchState:ps,rollState:rs,pitchOk:Math.abs(ps.deviation)<=LANDING_THRESHOLD,rollOk:Math.abs(rs.deviation)<=LANDING_THRESHOLD,get canLand(){return this.isUpright&&this.pitchOk&&this.rollOk;}};}
-function checkSpinLanding(s){const a=Math.abs(s),r=a%180,d=r<=90?r:r-180;return{deviation:d,ok:Math.abs(d)<=SPIN_THRESHOLD};}
+// ---- 判定 ----
+function axLS(d){const a=Math.abs(d),s=Math.round(a/180),n=s*180;return{deviation:a-n,flipped:(s%2)===1,segment:s};}
+function chkLP(p,r){const ps=axLS(p),rs=axLS(r);const u=((ps.flipped?1:0)+(rs.flipped?1:0))%2===0;return{isUpright:u,pitchState:ps,rollState:rs,pitchOk:Math.abs(ps.deviation)<=LANDING_THRESHOLD,rollOk:Math.abs(rs.deviation)<=LANDING_THRESHOLD,get canLand(){return this.isUpright&&this.pitchOk&&this.rollOk;}};}
+function chkSL(s){const a=Math.abs(s),r=a%180,d=r<=90?r:r-180;return{deviation:d,ok:Math.abs(d)<=SPIN_THRESHOLD};}
 
 function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
-async function ensureSensors(){
-  if(sensorReady)return true;
-  if(typeof DeviceMotionEvent!=='undefined'&&typeof DeviceMotionEvent.requestPermission==='function'){
-    try{const p=await DeviceMotionEvent.requestPermission();if(p!=='granted'){alert('モーションセンサーを許可してください');return false;}}
-    catch(e){alert('センサー許可エラー: '+e.message);return false;}
-  }
-  sensorReady=true;return true;
-}
+async function ensureSensors(){if(sensorReady)return true;if(typeof DeviceMotionEvent!=='undefined'&&typeof DeviceMotionEvent.requestPermission==='function'){try{const p=await DeviceMotionEvent.requestPermission();if(p!=='granted'){alert('モーションセンサーを許可してください');return false;}}catch(e){alert('センサー許可エラー: '+e.message);return false;}}sensorReady=true;return true;}
 
-// ============================================================
-//  メイン処理
-// ============================================================
+// ---- GO ----
 async function go(){
   if(phase!=='idle')return;if(!(await ensureSensors()))return;
-  $btn.disabled=true;
-  document.querySelectorAll('.kicker-opt').forEach(b=>b.style.pointerEvents='none');
-  $postInd.classList.remove('show');$medal.innerHTML='';
-  $scoreDsp.classList.remove('show');
-
-  const mSec = getMeasureSec();
-
+  $btn.disabled=true;document.querySelectorAll('.kicker-opt').forEach(b=>b.style.pointerEvents='none');
+  $postInd.classList.remove('show');$medal.innerHTML='';$scoreDsp.classList.remove('show');$shareRow.style.display='none';
+  if(selMode)toggleSelMode();
+  const mSec=getMeasureSec();
   phase='countdown';$disp.className='main-display countdown';
-  for(let i=COUNTDOWN_SEC;i>=1;i--){
-    $phase.textContent='GET READY';$phase.className='phase-label cd';
-    $big.className='big-text countdown-num';$big.textContent=i;
-    $sub.textContent=`${KICKERS[currentKicker].label} | 開始まで ${i}秒`;
-    await sleep(1000);if(phase==='idle')return;
-  }
-
-  $big.className='big-text go';$big.textContent='GO!';
-  $phase.textContent='RECORDING';$phase.className='phase-label rec';
-  $sub.textContent='スマホを回転させろ！';$disp.className='main-display recording';
-
-  integrated={pitch:0,roll:0,spin:0};prevTime=performance.now();recStart=prevTime;
-  sampleCount=0;peakRate=0;phase='recording';
-
+  for(let i=COUNTDOWN_SEC;i>=1;i--){$phase.textContent='GET READY';$phase.className='phase-label cd';$big.className='big-text countdown-num';$big.textContent=i;$sub.textContent=`${KICKERS[currentKicker].label} | 開始まで ${i}秒`;await sleep(1000);if(phase==='idle')return;}
+  $big.className='big-text go';$big.textContent='GO!';$phase.textContent='RECORDING';$phase.className='phase-label rec';$sub.textContent='スマホを回転させろ！';$disp.className='main-display recording';
+  integrated={pitch:0,roll:0,spin:0};prevTime=performance.now();recStart=prevTime;sampleCount=0;peakRate=0;phase='recording';
   window.addEventListener('devicemotion',onDM);tickUI(mSec);
 }
 
 function onDM(e){
   if(phase!=='recording')return;const rr=e.rotationRate;if(!rr)return;
-  const now=performance.now(),dt=(now-prevTime)/1000;prevTime=now;
-  if(dt<=0||dt>0.5)return;
+  const now=performance.now(),dt=(now-prevTime)/1000;prevTime=now;if(dt<=0||dt>0.5)return;
   const p=rr.alpha||0,r=rr.beta||0,s=rr.gamma||0;
-  integrated.pitch+=p*dt;integrated.roll+=r*dt;integrated.spin+=s*dt;
-  sampleCount++;
+  integrated.pitch+=p*dt;integrated.roll+=r*dt;integrated.spin+=s*dt;sampleCount++;
   const cr=Math.sqrt(p*p+r*r+s*s);if(cr>peakRate)peakRate=cr;
   $('dbRate').textContent=`P:${p.toFixed(0)} R:${r.toFixed(0)} S:${s.toFixed(0)}`;
   $('dbInt').textContent=(dt*1000).toFixed(1);
-  $('dbSpin').textContent=integrated.spin.toFixed(1)+'°';
-  $('dbPitch').textContent=integrated.pitch.toFixed(1)+'°';
-  $('dbRoll').textContent=integrated.roll.toFixed(1)+'°';
-  $('dbSamples').textContent=sampleCount;
-  const pos=checkLandingPosture(integrated.pitch,integrated.roll);
+  $('dbSpin').textContent=integrated.spin.toFixed(1)+'°';$('dbPitch').textContent=integrated.pitch.toFixed(1)+'°';$('dbRoll').textContent=integrated.roll.toFixed(1)+'°';$('dbSamples').textContent=sampleCount;
+  const pos=chkLP(integrated.pitch,integrated.roll);
   $('dbPL').textContent=`seg=${pos.pitchState.segment} flip=${pos.pitchState.flipped} dev=${pos.pitchState.deviation.toFixed(1)}°`;
   $('dbRL').textContent=`seg=${pos.rollState.segment} flip=${pos.rollState.flipped} dev=${pos.rollState.deviation.toFixed(1)}°`;
   $('dbUpright').textContent=pos.isUpright?'YES':'NO';
 }
 
 function tickUI(mSec){
-  if(phase!=='recording')return;
-  const el=(performance.now()-recStart)/1000;
-  $vSpin.textContent=Math.round(integrated.spin)+'°';
-  $vPitch.textContent=Math.round(integrated.pitch)+'°';
-  $vRoll.textContent=Math.round(integrated.roll)+'°';
+  if(phase!=='recording')return;const el=(performance.now()-recStart)/1000;
+  $vSpin.textContent=Math.round(integrated.spin)+'°';$vPitch.textContent=Math.round(integrated.pitch)+'°';$vRoll.textContent=Math.round(integrated.roll)+'°';
   $vSpin.className=$vPitch.className=$vRoll.className='value recording';
-  $vTime.textContent=el.toFixed(1)+'s';$vTime.className='value recording';
-  $vPeak.textContent=Math.round(peakRate);
-  const pos=checkLandingPosture(integrated.pitch,integrated.roll);
-  $vPosture.textContent=pos.isUpright?'UPRIGHT':'INVERTED';
-  $vPosture.style.color=pos.canLand?'#00ff88':'#ff4444';
+  $vTime.textContent=el.toFixed(1)+'s';$vTime.className='value recording';$vPeak.textContent=Math.round(peakRate);
+  const pos=chkLP(integrated.pitch,integrated.roll);
+  $vPosture.textContent=pos.isUpright?'UPRIGHT':'INVERTED';$vPosture.style.color=pos.canLand?'#00ff88':'#ff4444';
   $sub.textContent=`残り ${Math.max(0,mSec-el).toFixed(1)}s`;
-  if(el>=mSec){finishRecording(el);return;}
-  rafId=requestAnimationFrame(()=>tickUI(mSec));
+  if(el>=mSec){finishRec(el);return;}rafId=requestAnimationFrame(()=>tickUI(mSec));
 }
 
-// ============================================================
-//  メーター更新
-// ============================================================
-function updateMeter(mid,vid,dev,threshold){
-  const pct=((dev+90)/180)*100;const mk=$(mid);
-  mk.style.left=`calc(${Math.max(0,Math.min(100,pct))}% - 2px)`;
-  mk.style.background=Math.abs(dev)<=threshold?'#00ff88':'#ff4444';
-  $(vid).textContent=(dev>=0?'+':'')+Math.round(dev)+'°';
-  $(vid).style.color=Math.abs(dev)<=threshold?'#00ff88':'#ff4444';
-}
-function showPostureIndicator(pos,spL){
-  $postInd.classList.add('show');
-  updateMeter('spinMarker','spinVal',spL.deviation,SPIN_THRESHOLD);
-  updateMeter('pitchMarker','pitchVal',pos.pitchState.deviation,LANDING_THRESHOLD);
-  updateMeter('rollMarker','rollVal',pos.rollState.deviation,LANDING_THRESHOLD);
-  if(pos.canLand&&spL.ok){$postStatus.textContent='CLEAN LANDING';$postStatus.style.color='#00ff88';}
-  else if(!pos.isUpright){$postStatus.textContent='INVERTED - 逆さま！';$postStatus.style.color='#ff4444';}
-  else{$postStatus.textContent='UNSTABLE LANDING';$postStatus.style.color='#ff8800';}
-}
+function updMeter(mid,vid,dev,th){const p=((dev+90)/180)*100;const mk=$(mid);mk.style.left=`calc(${Math.max(0,Math.min(100,p))}% - 2px)`;mk.style.background=Math.abs(dev)<=th?'#00ff88':'#ff4444';$(vid).textContent=(dev>=0?'+':'')+Math.round(dev)+'°';$(vid).style.color=Math.abs(dev)<=th?'#00ff88':'#ff4444';}
+function showPI(pos,spL){$postInd.classList.add('show');updMeter('spinMarker','spinVal',spL.deviation,SPIN_THRESHOLD);updMeter('pitchMarker','pitchVal',pos.pitchState.deviation,LANDING_THRESHOLD);updMeter('rollMarker','rollVal',pos.rollState.deviation,LANDING_THRESHOLD);
+  if(pos.canLand&&spL.ok){$postStatus.textContent='CLEAN LANDING';$postStatus.style.color='#00ff88';}else if(!pos.isUpright){$postStatus.textContent='INVERTED';$postStatus.style.color='#ff4444';}else{$postStatus.textContent='UNSTABLE';$postStatus.style.color='#ff8800';}}
 
-// ============================================================
-//  スコア表示
-// ============================================================
-function showScore(baseScore, kicker) {
-  const k = KICKERS[kicker];
-  const finalScore = Math.round(baseScore * k.multiplier);
+function showScore(base,kicker){const k=KICKERS[kicker];const f=Math.round(base*k.multiplier);$scoreDsp.classList.add('show');$scoreDsp.classList.remove('score-appear');void $scoreDsp.offsetWidth;$scoreDsp.classList.add('score-appear');$scoreNum.textContent=f.toLocaleString();return f;}
 
-  $scoreDsp.classList.add('show');
-  $scoreDsp.classList.remove('score-appear');
-  void $scoreDsp.offsetWidth;
-  $scoreDsp.classList.add('score-appear');
-
-  $scoreNum.textContent = finalScore.toLocaleString();
-
-  return finalScore;
-}
-
-// ============================================================
-//  計測完了
-// ============================================================
-function finishRecording(elapsed){
-  phase='done';window.removeEventListener('devicemotion',onDM);
-  if(rafId)cancelAnimationFrame(rafId);
+function finishRec(elapsed){
+  phase='done';window.removeEventListener('devicemotion',onDM);if(rafId)cancelAnimationFrame(rafId);
   [$vSpin,$vPitch,$vRoll,$vTime].forEach(el=>el.className='value');
-
   const aS=Math.abs(integrated.spin),aP=Math.abs(integrated.pitch),aR=Math.abs(integrated.roll);
-  const kicker = KICKERS[currentKicker];
 
-  // Straight Jump
   if(aS<=SPIN_THRESHOLD&&aP<=SPIN_THRESHOLD&&aR<=SPIN_THRESHOLD){
-    const pos=checkLandingPosture(integrated.pitch,integrated.roll);
-    showPostureIndicator(pos,{deviation:0,ok:true});
+    const pos=chkLP(integrated.pitch,integrated.roll);showPI(pos,{deviation:0,ok:true});
     if(pos.canLand){
-      const avg=(aS+aP+aR)/3,prec=1-avg/SPIN_THRESHOLD;
-      const base=Math.round(500*(1+prec));
-      showRes('landed','MAKE!','done','big-text trick','Straight Jump',
-        `Spin:${Math.round(aS)}° Pitch:${Math.round(aP)}° Roll:${Math.round(aR)}°`);
-      const final = showScore(base, currentKicker);
-      $medal.innerHTML='';
-      addHist('Straight Jump',0,elapsed,final,false,null,currentKicker);
-    } else {
-      const f=[];if(!pos.isUpright)f.push('逆さま');
-      if(!pos.pitchOk)f.push(`Pitch ズレ: ${Math.abs(pos.pitchState.deviation).toFixed(0)}°`);
-      if(!pos.rollOk)f.push(`Roll ズレ: ${Math.abs(pos.rollState.deviation).toFixed(0)}°`);
-      showRes('crashed','CRASH!','crash','big-text fail','着地失敗...',`Straight失敗 | ${f.join(' / ')}`);
-      $medal.innerHTML='';$scoreDsp.classList.remove('show');
+      const avg=(aS+aP+aR)/3,prec=1-avg/SPIN_THRESHOLD,base=Math.round(500*(1+prec));
+      showRes('landed','MAKE!','done','big-text trick','Straight Jump',`S:${Math.round(aS)}° P:${Math.round(aP)}° R:${Math.round(aR)}°`);
+      const fs=showScore(base,currentKicker);$medal.innerHTML='';
+      lastResult={trick:'Straight Jump',score:fs,kicker:currentKicker,title:null};
+      $shareRow.style.display='flex';
+      addHist('Straight Jump',0,elapsed,fs,false,null,currentKicker);
+    }else{
+      const f=[];if(!pos.isUpright)f.push('逆さま');if(!pos.pitchOk)f.push(`Pitch:${Math.abs(pos.pitchState.deviation).toFixed(0)}°`);if(!pos.rollOk)f.push(`Roll:${Math.abs(pos.rollState.deviation).toFixed(0)}°`);
+      showRes('crashed','CRASH!','crash','big-text fail','着地失敗...',`Straight失敗 | ${f.join(' / ')}`);$medal.innerHTML='';$scoreDsp.classList.remove('show');lastResult=null;$shareRow.style.display='none';
       addHist('CRASH (Straight)',0,elapsed,0,true,null,currentKicker);
     }
     resetDelay(3500);return;
   }
 
-  const pos=checkLandingPosture(integrated.pitch,integrated.roll);
-  const spL=checkSpinLanding(integrated.spin);
-  showPostureIndicator(pos,spL);
-
+  const pos=chkLP(integrated.pitch,integrated.roll),spL=chkSL(integrated.spin);showPI(pos,spL);
   const fails=[];
   if(!pos.isUpright)fails.push('逆さま');
-  if(!pos.pitchOk)fails.push(`Pitch ズレ: ${Math.abs(pos.pitchState.deviation).toFixed(0)}°（許容${LANDING_THRESHOLD}°）`);
-  if(!pos.rollOk)fails.push(`Roll ズレ: ${Math.abs(pos.rollState.deviation).toFixed(0)}°（許容${LANDING_THRESHOLD}°）`);
-  if(!spL.ok)fails.push(`Spin ズレ: ${Math.abs(spL.deviation).toFixed(0)}°（許容${SPIN_THRESHOLD}°）`);
+  if(!pos.pitchOk)fails.push(`Pitch:${Math.abs(pos.pitchState.deviation).toFixed(0)}°(>${LANDING_THRESHOLD}°)`);
+  if(!pos.rollOk)fails.push(`Roll:${Math.abs(pos.rollState.deviation).toFixed(0)}°(>${LANDING_THRESHOLD}°)`);
+  if(!spL.ok)fails.push(`Spin:${Math.abs(spL.deviation).toFixed(0)}°(>${SPIN_THRESHOLD}°)`);
 
-  const sDir=integrated.spin<=0?'BS':'FS';
-  const pDir=integrated.pitch>=0?'BackFlip':'FrontFlip';
+  const sDir=integrated.spin<=0?'BS':'FS',pDir=integrated.pitch>=0?'BackFlip':'FrontFlip';
   const sSnap=Math.round(aS/180)*180,pSnap=Math.round(aP/360)*360,rSnap=Math.round(aR/360)*360;
-  let axis;
-  if(aS>=aP&&aS>=aR)axis='spin';else if(aP>=aR)axis='pitch';else axis='roll';
+  let axis;if(aS>=aP&&aS>=aR)axis='spin';else if(aP>=aR)axis='pitch';else axis='roll';
 
   if(fails.length>0){
-    const raw=`Spin:${Math.round(aS)}° Pitch:${Math.round(aP)}° Roll:${Math.round(aR)}°`;
-    showRes('crashed','CRASH!','crash','big-text fail','着地失敗...',`${raw}\n${fails.join(' / ')}`);
-    $medal.innerHTML='';$scoreDsp.classList.remove('show');
-    addHist(`CRASH (${raw})`,0,elapsed,0,true,null,currentKicker);
+    showRes('crashed','CRASH!','crash','big-text fail','着地失敗...',`S:${Math.round(aS)}° P:${Math.round(aP)}° R:${Math.round(aR)}°\n${fails.join(' / ')}`);
+    $medal.innerHTML='';$scoreDsp.classList.remove('show');lastResult=null;$shareRow.style.display='none';
+    addHist(`CRASH (S:${Math.round(aS)}° P:${Math.round(aP)}° R:${Math.round(aR)}°)`,0,elapsed,0,true,null,currentKicker);
     resetDelay(3500);return;
   }
 
   const trick=buildTrick(sDir,pDir,axis,sSnap,pSnap,rSnap);
-  const base=calcScore(sSnap,pSnap,rSnap,elapsed,axis,
-    Math.abs(spL.deviation),Math.abs(pos.pitchState.deviation),Math.abs(pos.rollState.deviation));
-  const totalSnap=sSnap+pSnap+rSnap;
-  const title=getTitleForDeg(totalSnap);
+  const base=calcScore(sSnap,pSnap,rSnap,elapsed,axis,Math.abs(spL.deviation),Math.abs(pos.pitchState.deviation),Math.abs(pos.rollState.deviation));
+  const totalSnap=sSnap+pSnap+rSnap;const title=getTitleForDeg(totalSnap);
+  showRes('landed','MAKE!','done','big-text trick',trick,`S:${Math.round(aS)}° P:${Math.round(aP)}° R:${Math.round(aR)}°`);
+  const fs=showScore(base,currentKicker);
+  if(title){$medal.innerHTML=`<div class="medal-badge ${title.medal}">${title.label}</div>`;}else{$medal.innerHTML='';}
+  lastResult={trick,score:fs,kicker:currentKicker,title};
+  $shareRow.style.display='flex';
   const mainDeg=axis==='spin'?sSnap:(axis==='pitch'?pSnap:rSnap);
-
-  showRes('landed','MAKE!','done','big-text trick',trick,
-    `Spin:${Math.round(aS)}° Pitch:${Math.round(aP)}° Roll:${Math.round(aR)}°`);
-
-  const finalScore = showScore(base, currentKicker);
-
-  if(title){
-    $medal.innerHTML=`<div class="medal-badge ${title.medal}">${title.label}</div>`;
-  } else { $medal.innerHTML=''; }
-
-  addHist(trick,mainDeg,elapsed,finalScore,false,title,currentKicker);
+  addHist(trick,mainDeg,elapsed,fs,false,title,currentKicker);
   resetDelay(3500);
 }
 
 function buildTrick(sDir,pDir,axis,sSnap,pSnap,rSnap){
-  let parts=[];
-  if(axis==='spin'){
-    parts.push(sDir);if(pSnap>=360)parts=[sDir,'Cork'];
-    parts.push(sSnap+'°');
-    if(pSnap>=360){const f=Math.round(pSnap/360);if(f>1)parts.push('+ '+f+'Flip');}
-  }else if(axis==='pitch'){
-    const f=Math.round(pSnap/360);
-    if(f<=1)parts.push(pDir);else if(f===2)parts.push('Double '+pDir);else parts.push(f+'x '+pDir);
-    if(sSnap>=180)parts.push(sDir+' '+sSnap+'°');
-  }else{
-    const r=Math.round(rSnap/360);parts.push(sDir);
-    if(r<=1)parts.push('Barrel Roll');else parts.push(r+'x Barrel Roll');
-    if(sSnap>=180)parts.push('+ '+sSnap+'°');
-  }
-  return parts.join(' ');
+  let p=[];
+  if(axis==='spin'){p.push(sDir);if(pSnap>=360)p=[sDir,'Cork'];p.push(sSnap+'°');if(pSnap>=360){const f=Math.round(pSnap/360);if(f>1)p.push('+ '+f+'Flip');}}
+  else if(axis==='pitch'){const f=Math.round(pSnap/360);if(f<=1)p.push(pDir);else if(f===2)p.push('Double '+pDir);else p.push(f+'x '+pDir);if(sSnap>=180)p.push(sDir+' '+sSnap+'°');}
+  else{const r=Math.round(rSnap/360);p.push(sDir);if(r<=1)p.push('Barrel Roll');else p.push(r+'x Barrel Roll');if(sSnap>=180)p.push('+ '+sSnap+'°');}
+  return p.join(' ');
 }
 
 function calcScore(sSnap,pSnap,rSnap,time,axis,sDev,pDev,rDev){
-  let s = sSnap*10 + pSnap*25 + rSnap*20;
-  const ac=[sSnap,pSnap,rSnap].filter(v=>v>0).length;
-  if(ac>=2)s*=1.3;if(ac>=3)s*=1.5;
-  const tot=sSnap+pSnap+rSnap;
-  if(tot>=1080)s*=1.3;
-  s*=(1+tot/(time*360));
-  const avg=(sDev+pDev+rDev)/3,mx=Math.max(SPIN_THRESHOLD,LANDING_THRESHOLD);
-  s*=1+0.5*(1-avg/mx);
+  let s=sSnap*10+pSnap*25+rSnap*20;
+  const ac=[sSnap,pSnap,rSnap].filter(v=>v>0).length;if(ac>=2)s*=1.3;if(ac>=3)s*=1.5;
+  const tot=sSnap+pSnap+rSnap;if(tot>=1080)s*=1.3;s*=(1+tot/(time*360));
+  const avg=(sDev+pDev+rDev)/3,mx=Math.max(SPIN_THRESHOLD,LANDING_THRESHOLD);s*=1+0.5*(1-avg/mx);
   return Math.round(s);
 }
 
-function showRes(c,pt,pc,bc,bt,st){
-  $disp.className='main-display '+c;$phase.textContent=pt;$phase.className='phase-label '+pc;
-  $big.className=bc;$big.textContent=bt;$sub.textContent=st;
+function showRes(c,pt,pc,bc,bt,st){$disp.className='main-display '+c;$phase.textContent=pt;$phase.className='phase-label '+pc;$big.className=bc;$big.textContent=bt;$sub.textContent=st;}
+
+// ---- シェア ----
+function shareResult(type){
+  if(!lastResult)return;
+  const t=lastResult.title?` [${lastResult.title.label}]`:'';
+  const text=`${lastResult.trick}${t}\nScore: ${lastResult.score.toLocaleString()} pt\n${KICKERS[lastResult.kicker].label}\n#SpinTrickJudge`;
+
+  if(type==='x'){
+    const url='https://x.com/intent/tweet?text='+encodeURIComponent(text);
+    window.open(url,'_blank');
+  } else if(type==='copy'){
+    navigator.clipboard.writeText(text).then(()=>showToast('コピーしました！')).catch(()=>{
+      const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);showToast('コピーしました！');
+    });
+  } else if(type==='image'){
+    captureResult();
+  }
 }
 
+async function captureResult(){
+  showToast('画像を生成中...',3000);
+  try{
+    // html2canvas を動的ロード
+    if(!window.html2canvas){
+      await new Promise((resolve,reject)=>{
+        const s=document.createElement('script');
+        s.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+        s.onload=resolve;s.onerror=reject;document.head.appendChild(s);
+      });
+    }
+    const canvas=await html2canvas($disp,{backgroundColor:'#0a0a2e',scale:2,useCORS:true});
+    canvas.toBlob(blob=>{
+      if(navigator.share&&navigator.canShare&&navigator.canShare({files:[new File([blob],'trick.png',{type:'image/png'})]})){
+        navigator.share({files:[new File([blob],'trick.png',{type:'image/png'})],title:'Spin Trick Judge',text:lastResult.trick});
+      } else {
+        const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`trick_${Date.now()}.png`;a.click();URL.revokeObjectURL(a.href);
+        showToast('画像を保存しました！');
+      }
+    },'image/png');
+  }catch(e){showToast('画像生成に失敗しました');console.error(e);}
+}
+
+// ---- 履歴 ----
 function addHist(trick,deg,time,score,fail,title,kicker){
-  history.unshift({trick,deg,time,score,fail,title,kicker});
-  if(history.length>15)history.length=15;renderHist();
+  history.unshift({id:Date.now(),trick,deg,time,score,fail,title,kicker});
+  if(history.length>50)history.length=50;
+  saveHistory();renderHist();
+}
+
+let selModeActive=false;
+function toggleSelMode(){
+  selModeActive=!selModeActive;selectedIds.clear();
+  $('btnSelMode').textContent=selModeActive?'Cancel':'Select';
+  $('btnDelSel').style.display=selModeActive?'inline-block':'none';
+  $('btnDelAll').style.display=selModeActive?'inline-block':'none';
+  renderHist();
+}
+
+function toggleSelect(id){
+  if(selectedIds.has(id))selectedIds.delete(id);else selectedIds.add(id);
+  renderHist();
+}
+
+function deleteSelected(){
+  if(selectedIds.size===0){showToast('項目を選択してください');return;}
+  history=history.filter(h=>!selectedIds.has(h.id));
+  selectedIds.clear();saveHistory();renderHist();
+  showToast('削除しました');if(history.length===0){$hSec.style.display='none';toggleSelMode();}
+}
+
+function deleteAll(){
+  if(!confirm('全履歴を削除しますか？'))return;
+  history=[];selectedIds.clear();saveHistory();$hList.innerHTML='';$hSec.style.display='none';
+  if(selModeActive)toggleSelMode();showToast('全履歴を削除しました');
 }
 
 function renderHist(){
+  if(history.length===0){$hSec.style.display='none';return;}
   $hSec.style.display='block';let rank=0;
   const sorted=[...history].sort((a,b)=>{if(a.fail&&!b.fail)return 1;if(!a.fail&&b.fail)return-1;return b.score-a.score;});
-  const rm=new Map();sorted.forEach(h=>{if(!h.fail){rank++;rm.set(h,rank);}});
+  const rm=new Map();sorted.forEach(h=>{if(!h.fail){rank++;rm.set(h.id,rank);}});
+
   $hList.innerHTML=history.map(h=>{
-    const kLabel = KICKERS[h.kicker]?.label || h.kicker;
-    if(h.fail)return`<div class="h-item fail-item"><div><div class="h-trick fail-text">${h.trick}</div><div class="h-info">${h.time.toFixed(1)}s | ${kLabel}</div></div><div><div class="h-score crashed-score">CRASH</div></div></div>`;
+    const sm=selModeActive?' sel-mode':'';
+    const sel=selectedIds.has(h.id)?' selected':'';
+    const chk=selectedIds.has(h.id)?'checked':'';
+    const kL=KICKERS[h.kicker]?.label||h.kicker;
+    const onclick=selModeActive?`onclick="toggleSelect(${h.id})"`:'';
+
+    if(h.fail)return`<div class="h-item fail-item${sm}${sel}" ${onclick}>${selModeActive?`<div class="h-check ${chk}"></div>`:''}<div class="h-content"><div class="h-trick fail-text">${h.trick}</div><div class="h-info">${h.time.toFixed(1)}s | ${kL}</div></div><div class="h-score-col"><div class="h-score crashed-score">CRASH</div></div></div>`;
+
     const mb=h.title?`<div class="mini-badge ${h.title.mb}">${h.title.label}</div>`:'';
-    return`<div class="h-item"><div><div class="h-trick">${h.trick}</div>${mb}<div class="h-info">${h.deg}° / ${h.time.toFixed(1)}s</div><div class="h-kicker">${kLabel}</div></div><div class="h-score-col"><div class="h-score success">${h.score.toLocaleString()} pt</div><div class="h-rank">#${rm.get(h)||'-'}</div></div></div>`;
+    return`<div class="h-item${sm}${sel}" ${onclick}>${selModeActive?`<div class="h-check ${chk}"></div>`:''}<div class="h-content"><div class="h-trick">${h.trick}</div>${mb}<div class="h-info">${h.deg}° / ${h.time.toFixed(1)}s</div><div class="h-kicker">${kL}</div></div><div class="h-score-col"><div class="h-score success">${h.score.toLocaleString()} pt</div><div class="h-rank">#${rm.get(h.id)||'-'}</div></div></div>`;
   }).join('');
 }
 
 function resetDelay(ms){setTimeout(()=>{phase='idle';$btn.disabled=false;$btn.textContent='START';document.querySelectorAll('.kicker-opt').forEach(b=>b.style.pointerEvents='auto');},ms);}
+
+// ---- 起動時に履歴ロード ----
+loadHistory();
 </script>
 
 </body>
