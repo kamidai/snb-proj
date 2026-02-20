@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Spin Trick Judge v10</title>
+<title>BIG AIR CHALLENGE v10</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -641,7 +641,7 @@ async function captureResult(){
     const canvas=await html2canvas($disp,{backgroundColor:'#0a0a2e',scale:2,useCORS:true});
     canvas.toBlob(blob=>{
       if(navigator.share&&navigator.canShare&&navigator.canShare({files:[new File([blob],'trick.png',{type:'image/png'})]})){
-        navigator.share({files:[new File([blob],'trick.png',{type:'image/png'})],title:'Spin Trick Judge',text:lastResult.trick});
+        navigator.share({files:[new File([blob],'trick.png',{type:'image/png'})],title:'BIG AIR CHALLENGE',text:lastResult.trick});
       } else {
         const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`trick_${Date.now()}.png`;a.click();URL.revokeObjectURL(a.href);
         showToast('画像を保存しました！');
