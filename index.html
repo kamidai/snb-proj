@@ -310,7 +310,7 @@
 
 <div class="app">
   <h1 id="appTitle">SPIN TRICK JUDGE</h1>
-  <p class="ver">v10</p>
+  <p class="ver">v10 History function added</p>
 
   <div class="main-display" id="mainDisplay">
     <div id="medalContainer"></div>
@@ -321,11 +321,13 @@
       <div class="score-label">SCORE</div>
       <div class="score-number" id="scoreNumber">0</div>
     </div>
+<!--
     <div class="share-row" id="shareRow" style="display:none;">
       <button class="share-btn" onclick="shareResult('x')"><svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>Post</button>
       <button class="share-btn" onclick="shareResult('copy')"><svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>Copy</button>
       <button class="share-btn" onclick="shareResult('image')"><svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>Save</button>
     </div>
+-->
     <div class="posture-indicator" id="postureInd">
       <div class="posture-row">
         <span class="posture-label">Spin</span>
@@ -441,7 +443,7 @@ let titleTaps=0,titleTimer=null;
 const $=id=>document.getElementById(id);
 const $disp=$('mainDisplay'),$phase=$('phaseLabel'),$big=$('bigText'),$sub=$('subText');
 const $medal=$('medalContainer'),$scoreDsp=$('scoreDisplay'),$scoreNum=$('scoreNumber');
-const $shareRow=$('shareRow');
+const $shareRow=$('shareRow') || { style: {} };
 const $vSpin=$('vSpin'),$vPitch=$('vPitch'),$vRoll=$('vRoll');
 const $vTime=$('vTime'),$vPosture=$('vPosture'),$vPeak=$('vPeak');
 const $btn=$('btnGo'),$hSec=$('histSec'),$hList=$('histList');
