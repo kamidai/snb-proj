@@ -131,27 +131,27 @@
   }
   @keyframes medalDrop { 0% { transform: scale(0) rotate(-30deg) translateY(-40px); opacity: 0; } 100% { transform: scale(1) rotate(0deg) translateY(0); opacity: 1; } }
 
-  .medal-basic { background: radial-gradient(circle at 35% 35%,#888,#444); color: #ddd; }
-  .medal-nice { background: radial-gradient(circle at 35% 35%,#5dade2,#1a5276); color: #d6eaf8; }
-  .medal-good { background: radial-gradient(circle at 35% 35%,#58d68d,#1e8449); color: #d5f5e3; }
-  .medal-sick { background: radial-gradient(circle at 35% 35%,#f7dc6f,#b7950b); color: #4a3f00; }
+  .medal-clean { background: radial-gradient(circle at 35% 35%,#888,#444); color: #ddd; }
+  .medal-smooth { background: radial-gradient(circle at 35% 35%,#5dade2,#1a5276); color: #d6eaf8; }
+  .medal-tight { background: radial-gradient(circle at 35% 35%,#58d68d,#1e8449); color: #d5f5e3; }
+  .medal-cool { background: radial-gradient(circle at 35% 35%,#f7dc6f,#b7950b); color: #4a3f00; }
   .medal-dope { background: radial-gradient(circle at 35% 35%,#f0b27a,#ca6f1e); color: #4a2800; }
-  .medal-fire { background: radial-gradient(circle at 35% 35%,#f1948a,#c0392b); color: #fdedec;
+  .medal-sick { background: radial-gradient(circle at 35% 35%,#f1948a,#c0392b); color: #fdedec;
                 filter: drop-shadow(0 3px 8px rgba(0,0,0,0.5)) drop-shadow(0 0 12px rgba(231,76,60,0.5)); }
-  .medal-epic { background: radial-gradient(circle at 35% 35%,#f48fb1,#c2185b); color: #fce4ec;
+  .medal-fire { background: radial-gradient(circle at 35% 35%,#f48fb1,#c2185b); color: #fce4ec;
                 filter: drop-shadow(0 3px 8px rgba(0,0,0,0.5)) drop-shadow(0 0 12px rgba(233,30,99,0.5)); }
-  .medal-legendary { background: radial-gradient(circle at 35% 35%,#ce93d8,#6a1b9a); color: #f3e5f5;
+  .medal-nasty { background: radial-gradient(circle at 35% 35%,#ce93d8,#6a1b9a); color: #f3e5f5;
                      filter: drop-shadow(0 3px 8px rgba(0,0,0,0.5)) drop-shadow(0 0 15px rgba(156,39,176,0.5)); }
-  .medal-mythic { background: radial-gradient(circle at 35% 35%,#4dd0e1,#00838f); color: #e0f7fa;
+  .medal-gnarly { background: radial-gradient(circle at 35% 35%,#4dd0e1,#00838f); color: #e0f7fa;
                   filter: drop-shadow(0 3px 8px rgba(0,0,0,0.5)) drop-shadow(0 0 15px rgba(0,188,212,0.5)); }
-  .medal-godlike { background: radial-gradient(circle at 35% 35%,#ffe082,#b8860b); color: #3e2c00;
+  .medal-epic { background: radial-gradient(circle at 35% 35%,#ffe082,#b8860b); color: #3e2c00;
                    filter: drop-shadow(0 3px 8px rgba(0,0,0,0.5)) drop-shadow(0 0 20px rgba(255,215,0,0.6));
                    animation: medalDrop 0.6s cubic-bezier(0.34,1.56,0.64,1) both, medalGlow 2s ease-in-out infinite; }
   @keyframes medalGlow {
     0%,100% { filter: drop-shadow(0 3px 8px rgba(0,0,0,0.5)) drop-shadow(0 0 20px rgba(255,215,0,0.5)); }
     50% { filter: drop-shadow(0 3px 8px rgba(0,0,0,0.5)) drop-shadow(0 0 35px rgba(255,215,0,0.9)); }
   }
-  .medal-transcendent { background: conic-gradient(#ff0000,#ff8800,#ffff00,#00ff00,#0088ff,#8800ff,#ff0000);
+  .medal-insane { background: conic-gradient(#ff0000,#ff8800,#ffff00,#00ff00,#0088ff,#8800ff,#ff0000);
                         color: #fff; text-shadow: 0 0 3px rgba(0,0,0,0.7);
                         filter: drop-shadow(0 3px 8px rgba(0,0,0,0.5));
                         animation: medalDrop 0.6s cubic-bezier(0.34,1.56,0.64,1) both, medalSpin 4s linear infinite; }
@@ -159,17 +159,17 @@
     0% { background: conic-gradient(from 0deg,#ff0000,#ff8800,#ffff00,#00ff00,#0088ff,#8800ff,#ff0000); }
     100% { background: conic-gradient(from 360deg,#ff0000,#ff8800,#ffff00,#00ff00,#0088ff,#8800ff,#ff0000); }
   }
-  .medal-impossible { background: radial-gradient(circle at 35% 35%,#fff,#b0bec5,#eceff1); color: #263238;
+  .medal-slay { background: radial-gradient(circle at 35% 35%,#fff,#b0bec5,#eceff1); color: #263238;
                       filter: drop-shadow(0 3px 8px rgba(0,0,0,0.5)) drop-shadow(0 0 15px rgba(255,255,255,0.5));
                       animation: medalDrop 0.6s cubic-bezier(0.34,1.56,0.64,1) both, medalGlow2 2s ease-in-out infinite; }
   @keyframes medalGlow2 {
     0%,100% { filter: drop-shadow(0 3px 8px rgba(0,0,0,0.5)) drop-shadow(0 0 15px rgba(255,255,255,0.4)); }
     50% { filter: drop-shadow(0 3px 8px rgba(0,0,0,0.5)) drop-shadow(0 0 30px rgba(255,255,255,0.8)); }
   }
-  .medal-beyond { background: radial-gradient(circle at 30% 30%,#e0f7fa,#4dd0e1,#00838f); color: #004d40;
+  .medal-goated { background: radial-gradient(circle at 30% 30%,#e0f7fa,#4dd0e1,#00838f); color: #004d40;
                   filter: drop-shadow(0 3px 8px rgba(0,0,0,0.5)) drop-shadow(0 0 20px rgba(178,235,242,0.6));
                   animation: medalDrop 0.6s cubic-bezier(0.34,1.56,0.64,1) both, medalGlow2 2s ease-in-out infinite; }
-  .medal-universe { background: radial-gradient(circle at 40% 40%,#1a0533,#0d0221,#000); color: #e0e0ff;
+  .medal-yokikana { background: radial-gradient(circle at 40% 40%,#1a0533,#0d0221,#000); color: #e0e0ff;
                     text-shadow: 0 0 8px rgba(124,77,255,0.9);
                     filter: drop-shadow(0 3px 8px rgba(0,0,0,0.5)) drop-shadow(0 0 25px rgba(124,77,255,0.6));
                     animation: medalDrop 0.6s cubic-bezier(0.34,1.56,0.64,1) both, medalCosmic 3s ease-in-out infinite; }
@@ -179,14 +179,14 @@
   }
 
   .mini-badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.55em; font-weight: 700; letter-spacing: 1px; margin-top: 2px; }
-  .mb-basic{background:#555;color:#ccc;}.mb-nice{background:#1a5276;color:#d6eaf8;}.mb-good{background:#1e8449;color:#d5f5e3;}
-  .mb-sick{background:#b7950b;color:#fef9e7;}.mb-dope{background:#ca6f1e;color:#fdebd0;}.mb-fire{background:#c0392b;color:#fdedec;}
-  .mb-epic{background:#c2185b;color:#fce4ec;}.mb-legendary{background:#6a1b9a;color:#f3e5f5;}.mb-mythic{background:#00838f;color:#e0f7fa;}
-  .mb-godlike{background:#b8860b;color:#fff8dc;}
-  .mb-transcendent{background:linear-gradient(90deg,#f00,#f80,#ff0,#0f0,#08f,#80f);color:#fff;text-shadow:0 0 2px rgba(0,0,0,0.5);}
-  .mb-impossible{background:linear-gradient(135deg,#b0bec5,#eceff1);color:#263238;}
-  .mb-beyond{background:linear-gradient(135deg,#4dd0e1,#00838f);color:#e0f7fa;}
-  .mb-universe{background:#0d0221;color:#c0c0ff;border:1px solid #7c4dff;}
+  .mb-clean{background:#555;color:#ccc;}.mb-smooth{background:#1a5276;color:#d6eaf8;}.mb-tight{background:#1e8449;color:#d5f5e3;}
+  .mb-cool{background:#b7950b;color:#fef9e7;}.mb-dope{background:#ca6f1e;color:#fdebd0;}.mb-sick{background:#c0392b;color:#fdedec;}
+  .mb-fire{background:#c2185b;color:#fce4ec;}.mb-nasty{background:#6a1b9a;color:#f3e5f5;}.mb-gnarly{background:#00838f;color:#e0f7fa;}
+  .mb-epic{background:#b8860b;color:#fff8dc;}
+  .mb-insane{background:linear-gradient(90deg,#f00,#f80,#ff0,#0f0,#08f,#80f);color:#fff;text-shadow:0 0 2px rgba(0,0,0,0.5);}
+  .mb-slay{background:linear-gradient(135deg,#b0bec5,#eceff1);color:#263238;}
+  .mb-goated{background:linear-gradient(135deg,#4dd0e1,#00838f);color:#e0f7fa;}
+  .mb-yokikana{background:#0d0221;color:#c0c0ff;border:1px solid #7c4dff;}
 
   /* ---- 姿勢メーター（コンパクト化） ---- */
   .posture-indicator { margin: 8px auto 0; display: none; width: 92%; max-width: 310px; }
@@ -224,6 +224,7 @@
   .kicker-opt.active { border-color: #7b2ff7; color: #fff; background: rgba(123,47,247,0.2); }
   .kicker-opt .k-icon { font-size: 1.2em; line-height: 1; }
   .kicker-opt .k-name { font-size: 0.8em; }
+  .kicker-opt .k-bonus { font-size: 0.6em; opacity: 0.6; }
 
   /* ---- チートパネル ---- */
   .cheat-panel { display: none; margin-bottom: 8px; background: rgba(255,0,0,0.05); border: 1px solid rgba(255,0,0,0.2); border-radius: 10px; padding: 8px; }
@@ -309,7 +310,7 @@
 <div class="snow-container" id="snowContainer"></div>
 
 <div class="app">
-  <h1 id="appTitle">SPIN TRICK JUDGE</h1>
+  <h1 id="appTitle">BIG AIR CHALLENGE</h1>
   <p class="ver">v10 History function added</p>
 
   <div class="main-display" id="mainDisplay">
@@ -360,9 +361,9 @@
   </div>
 
   <div class="kicker-selector" id="kickerSelector">
-    <button class="kicker-opt" data-kicker="small" onclick="pickKicker(this)"><span class="k-icon">&#9650;</span><span class="k-name">Small</span></button>
-    <button class="kicker-opt active" data-kicker="medium" onclick="pickKicker(this)"><span class="k-icon">&#9650;&#9650;</span><span class="k-name">Medium</span></button>
-    <button class="kicker-opt" data-kicker="big" onclick="pickKicker(this)"><span class="k-icon">&#9650;&#9650;&#9650;</span><span class="k-name">Big</span></button>
+    <button class="kicker-opt" data-kicker="small" onclick="pickKicker(this)"><span class="k-icon">&#9650;</span><span class="k-name">Small</span><span class="k-bonus">Airtime:1.5s</span></button>
+    <button class="kicker-opt active" data-kicker="medium" onclick="pickKicker(this)"><span class="k-icon">&#9650;&#9650;</span><span class="k-name">Medium</span><span class="k-bonus">Airtime:2.0s</span></button>
+    <button class="kicker-opt" data-kicker="big" onclick="pickKicker(this)"><span class="k-icon">&#9650;&#9650;&#9650;</span><span class="k-name">Big</span><span class="k-bonus">Airtime:2.5s</span></button>
   </div>
 
   <div class="cheat-panel" id="cheatPanel">
@@ -414,21 +415,20 @@ const KICKERS={
 };
 
 const TITLE_TABLE=[
-  {min:2700,label:'YOKI-KANA',medal:'medal-universe',mb:'mb-universe'},
-  {min:2520,label:'UNIVERSE',medal:'medal-universe',mb:'mb-universe'},
-  {min:2340,label:'BEYOND',medal:'medal-beyond',mb:'mb-beyond'},
-  {min:2160,label:'IMPOSSIBLE',medal:'medal-impossible',mb:'mb-impossible'},
-  {min:1980,label:'TRANSCENDENT',medal:'medal-transcendent',mb:'mb-transcendent'},
-  {min:1800,label:'GODLIKE',medal:'medal-godlike',mb:'mb-godlike'},
-  {min:1620,label:'MYTHIC',medal:'medal-mythic',mb:'mb-mythic'},
-  {min:1440,label:'LEGENDARY',medal:'medal-legendary',mb:'mb-legendary'},
-  {min:1260,label:'EPIC',medal:'medal-epic',mb:'mb-epic'},
-  {min:1080,label:'FIRE',medal:'medal-fire',mb:'mb-fire'},
+  {min:2520,label:'YOKI-KANA',medal:'medal-yokikana',mb:'mb-yokikana'},
+  {min:2340,label:'GOATED',medal:'medal-goated',mb:'mb-goated'},
+  {min:2160,label:'SLAY',medal:'medal-slay',mb:'mb-slay'},
+  {min:1980,label:'INSANE',medal:'medal-insane',mb:'mb-insane'},
+  {min:1800,label:'EPIC',medal:'medal-epic',mb:'mb-epic'},
+  {min:1620,label:'GNARLY',medal:'medal-gnarly',mb:'mb-gnarly'},
+  {min:1440,label:'NASTY',medal:'medal-nasty',mb:'mb-nasty'},
+  {min:1260,label:'FIRE',medal:'medal-fire',mb:'mb-fire'},
+  {min:1080,label:'SICK',medal:'medal-sick',mb:'mb-sick'},
   {min:900,label:'DOPE',medal:'medal-dope',mb:'mb-dope'},
-  {min:720,label:'GREAT',medal:'medal-sick',mb:'mb-sick'},
-  {min:540,label:'GOOD',medal:'medal-good',mb:'mb-good'},
-  {min:360,label:'NICE',medal:'medal-nice',mb:'mb-nice'},
-  {min:180,label:'SOSO',medal:'medal-basic',mb:'mb-basic'},
+  {min:720,label:'COOL',medal:'medal-cool',mb:'mb-cool'},
+  {min:540,label:'TIGHT',medal:'medal-tight',mb:'mb-tight'},
+  {min:360,label:'SMOOTH',medal:'medal-smooth',mb:'mb-smooth'},
+  {min:180,label:'CLEAN',medal:'medal-clean',mb:'mb-clean'},
 ];
 function getTitleForDeg(d){for(const t of TITLE_TABLE)if(d>=t.min)return t;return null;}
 
